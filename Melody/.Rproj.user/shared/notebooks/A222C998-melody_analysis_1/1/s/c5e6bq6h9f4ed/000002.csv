@@ -1,0 +1,5 @@
+"0","df_cov <- df %>% dplyr::select(-dde:pcb_203, -triglycerides, -cholesterol)
+"
+"2","Error in inds_combine(.vars, ind_list) : 
+  Each argument must yield either positive or negative integers
+"

@@ -1,0 +1,4 @@
+"0","binnedplot(x = pred.probs_5 ,y = resid_5, nclass=NULL, "
+"0","            xlab=""dde"", ylab=""Average residual"", "
+"0","            main=""Binned residual plot: residual vs estimated probabilities"", "
+"0","            cex.pts=0.8, col.pts=1, col.int=""gray"")"

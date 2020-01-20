@@ -1,0 +1,404 @@
+---
+title: "Analysis_1"
+author: "Melody Jiang"
+date: "1/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+set.seed(42)
+```
+
+```{r}
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(corrplot)
+library(mice) # missing data imputation
+library(nnet) #multinomial regression models
+library(broom)
+library(arm) # binned residual plot
+library(car)
+```
+
+```{r}
+df <- readRDS("Longnecker.rds")
+```
+
+```{r}
+df <- df %>% dplyr::select(-albumin) # remove albumin because of too many missing values
+df <- df %>% mutate(early_delivery = ifelse(gestational_age < 37, 1, 0))
+```
+
+```{r}
+summary(df)
+```
+
+```{r}
+# remove row with na in pcb
+df <- df[!is.na(df$pcb_028), ]
+```
+
+```{r}
+summary(df) # now only covariates have missingness
+```
+
+```{r}
+# impute missing value
+
+```
+
+```{r}
+corrplot::corrplot(cor(df_imputed %>% dplyr::select(-race)))
+```
+
+We first examine results including only chemicals.
+
+```{r}
+model1 <- glm(early_delivery ~ ., 
+              data = df %>% dplyr::select(dde:pcb_203, triglycerides, cholesterol, early_delivery),
+              family = "binomial")
+```
+
+```{r}
+summary(model1)
+```
+
+We have seen high correlation between some variables, so p-value here might not be trust-worthy. Since our goal is to exammine associations, it is important to address problems with multicolinearity. We examine variation inflation factors (VIF) for multicolinearity.
+
+```{r}
+car::vif(model1)
+```
+
+We see that `pcb_105`, `pcb_118`, `pcb_153`, `pcb_138`, `pcb_180` shows moderate to high multicolinearity. `pcb_028`, `pcb_052`, `pcb_074`, `pcb_170`, `pcb_194`, `pcb_203` in pcb's shows acceptable multicolinearity.
+
+Next, we attempt mean centering chemicals, as normalizing variables could remove structural multicolinearity.
+
+```{r}
+df_chem <- df %>% dplyr::select(dde:pcb_203, triglycerides, cholesterol)
+df_cov <- df %>% dplyr::select(-(dde:pcb_203), -triglycerides, -cholesterol)
+df_chem_centered <- cbind(lapply(df_chem, function(x){scale(x, scale = FALSE)}),
+      df_cov)
+```
+
+We perform analysis and evaluation again.
+
+```{r}
+model2 <- glm(early_delivery ~ ., 
+              data = df_chem_centered %>% dplyr::select(dde:pcb_203, triglycerides, cholesterol, early_delivery),
+              family = "binomial")
+summary(model2)
+```
+
+```{r}
+car::vif(model2)
+```
+
+We see that mean-centering does not work. Let's try adding those with moderate to high multicolinearity (VIF >= 5).
+
+```{r}
+df <- df %>% mutate(pcb_sum = pcb_105 + pcb_118 + pcb_153 + pcb_138 + pcb_180)
+```
+
+```{r}
+corrplot::corrplot(cor(df %>% dplyr::select(dde, pcb_028, pcb_052, pcb_074, pcb_170, pcb_194,
+                                            pcb_203, pcb_sum, triglycerides, cholesterol, early_delivery)))
+```
+
+```{r}
+model3 <- glm(early_delivery ~ ., 
+              data = df %>% dplyr::select(dde, pcb_028, pcb_052, pcb_074, pcb_170, pcb_194,
+                                                        pcb_203, pcb_sum, triglycerides, cholesterol, early_delivery),
+              family = "binomial")
+summary(model3)
+```
+
+```{r}
+car::vif(model3)
+```
+
+Try other adding ups...
+
+```{r}
+df <- df %>% mutate(pcb_sum_2 = pcb_105 + pcb_153 + pcb_138 + pcb_180)
+```
+
+```{r}
+corrplot::corrplot(cor(df %>% dplyr::select(dde, pcb_028, pcb_052, pcb_074, pcb_170, pcb_194,
+                                            pcb_203, pcb_118, pcb_sum_2, triglycerides, cholesterol, early_delivery)))
+```
+
+```{r}
+model4 <- glm(early_delivery ~ ., 
+              data = df %>% dplyr::select(dde, pcb_028, pcb_052, pcb_074, pcb_170, pcb_194,
+                                                        pcb_203, pcb_118, pcb_sum_2, triglycerides, cholesterol, early_delivery),
+              family = "binomial")
+summary(model4)
+```
+
+```{r}
+confint(model3, 'dde', level=0.95)
+```
+
+```{r}
+car::vif(model4)
+```
+
+We see that vif of model 4 is not as good as model 3.
+
+We temporarily work from model 3 from now. Next, we check residual plots.
+
+```{r}
+pred.probs <-  predict(model3, type="response") # Calculate predicted probabilities
+resid <- if_else(df$early_delivery==1, 1, 0) - pred.probs # residuals
+```
+
+```{r}
+# residual plot
+plot(pred.probs, resid, main="Residual plot", 
+   xlab="estimated probabilities", ylab="residual", pch=19)
+abline(a = 0, b = 0)
+```
+
+```{r}
+binnedplot(x = pred.probs ,y = resid, nclass=NULL, 
+            xlab="dde", ylab="Average residual", 
+            main="Binned residual plot: residual vs estimated probabilities", 
+            cex.pts=0.8, col.pts=1, col.int="gray")
+```
+
+```{r}
+binnedplot(x = df$dde ,y = resid, nclass=NULL, 
+            xlab="dde", ylab="Average residual", 
+            main="Binned residual plot: residual vs dde", 
+            cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_028 ,y = resid, nclass=NULL, 
+                  xlab="pcb_028", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_028", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_052 ,y = resid, nclass=NULL, 
+                  xlab="pcb_052", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_052", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_074 ,y = resid, nclass=NULL, 
+                  xlab="pcb_074", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_074", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_170 ,y = resid, nclass=NULL, 
+                  xlab="pcb_170", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_170", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_194 ,y = resid, nclass=NULL, 
+                  xlab="pcb_194", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_194", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_203 ,y = resid, nclass=NULL, 
+                  xlab="pcb_203", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_203", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_118 ,y = resid, nclass=NULL, 
+                  xlab="pcb_118", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_118", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_sum_2 ,y = resid, nclass=NULL, 
+                  xlab="pcb_sum_2", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_sum_2", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$triglycerides ,y = resid, nclass=NULL, 
+                  xlab="triglycerides", ylab="Average residual", 
+                  main="Binned residual plot: residual vs triglycerides", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$cholesterol ,y = resid, nclass=NULL, 
+                  xlab="cholesterol", ylab="Average residual", 
+                  main="Binned residual plot: residual vs cholesterol", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+```
+
+```{r}
+# Graphing the fitted model
+jitter.binary <- function(a, jitt = .05){
+  ifelse(a == 0, runif(length(a), 0, jitt), runif(length(a), 1 - jitt, 1))
+}
+```
+
+```{r}
+early.jitter <- jitter.binary (df$early_delivery)
+plot (df$dde, early.jitter)
+curve (invlogit (coef(model3) [1] + coef(model3) [2]*x), add=TRUE)
+```
+
+Interactions between fat chemicales and harmful chemicals. We first mean center our variables.
+
+```{r}
+df_chem <- df %>% dplyr::select(dde:pcb_203, triglycerides, cholesterol, pcb_sum)
+df_cov <- df %>% dplyr::select(-(dde:pcb_203), -triglycerides, -cholesterol, -pcb_sum, -pcb_sum_2)
+df_chem_centered <- cbind(lapply(df_chem, function(x){scale(x, scale = FALSE)}),
+      df_cov)
+```
+
+```{r}
+model5 <- glm(early_delivery ~ . + dde:triglycerides + pcb_028:triglycerides + pcb_052:triglycerides + pcb_074:triglycerides + pcb_170:triglycerides + pcb_194:triglycerides + pcb_203:triglycerides + pcb_sum:triglycerides + dde:cholesterol + pcb_028:cholesterol + pcb_052:cholesterol + pcb_074:cholesterol + pcb_170:cholesterol + pcb_194:cholesterol + pcb_203:cholesterol + pcb_sum:cholesterol, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_028, pcb_052, pcb_074, pcb_170, pcb_194,
+                                                        pcb_203, pcb_sum, triglycerides, cholesterol, early_delivery),
+              family = "binomial")
+summary(model5)
+```
+
+```{r}
+car::vif(model5)
+```
+
+```{r}
+pred.probs_5 <-  predict(model5, type="response") # Calculate predicted probabilities
+resid_5 <- if_else(df$early_delivery==1, 1, 0) - pred.probs # residuals
+```
+
+```{r}
+# residual plot
+plot(pred.probs_5, resid_5, main="Residual plot", 
+   xlab="estimated probabilities", ylab="residual", pch=19)
+abline(a = 0, b = 0)
+```
+
+```{r}
+binnedplot(x = pred.probs_5 ,y = resid_5, nclass=NULL, 
+            xlab="dde", ylab="Average residual", 
+            main="Binned residual plot: residual vs estimated probabilities", 
+            cex.pts=0.8, col.pts=1, col.int="gray")
+```
+
+```{r}
+binnedplot(x = df$dde ,y = resid_5, nclass=NULL, 
+            xlab="dde", ylab="Average residual", 
+            main="Binned residual plot: residual vs dde", 
+            cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_028 ,y = resid_5, nclass=NULL, 
+                  xlab="pcb_028", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_028", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_052 ,y = resid_5, nclass=NULL, 
+                  xlab="pcb_052", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_052", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_074 ,y = resid_5, nclass=NULL, 
+                  xlab="pcb_074", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_074", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_170 ,y = resid_5, nclass=NULL, 
+                  xlab="pcb_170", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_170", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_194 ,y = resid_5, nclass=NULL, 
+                  xlab="pcb_194", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_194", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_203 ,y = resid_5, nclass=NULL, 
+                  xlab="pcb_203", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_203", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_118 ,y = resid_5, nclass=NULL, 
+                  xlab="pcb_118", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_118", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$pcb_sum ,y = resid_5, nclass=NULL, 
+                  xlab="pcb_sum_2", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_sum_2", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$triglycerides ,y = resid_5, nclass=NULL, 
+                  xlab="triglycerides", ylab="Average residual", 
+                  main="Binned residual plot: residual vs triglycerides", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+binnedplot(x = df$cholesterol ,y = resid_5, nclass=NULL, 
+                  xlab="cholesterol", ylab="Average residual", 
+                  main="Binned residual plot: residual vs cholesterol", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+```
+
+```{r}
+anova(model3, model5) # doesn't tell me significance?
+```
+
+```{r}
+# Jiyi mentioned adding all pcb's together. Let's try this.
+df_chem_centered <- df_chem_centered %>% mutate(pcb_sum_all = rowSums(df_chem_centered %>% dplyr::select(pcb_028:pcb_203)))
+```
+
+```{r}
+model6 <- glm(early_delivery ~ ., 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery),
+              family = "binomial")
+summary(model6)
+```
+
+```{r}
+car::vif(model6)
+```
+
+```{r}
+# Add in interactions
+model7 <- glm(early_delivery ~ . + dde:triglycerides + dde:cholesterol + pcb_sum_all:triglycerides + pcb_sum_all:cholesterol, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery),
+              family = "binomial")
+summary(model7)
+```
+
+```{r}
+car::vif(model7)
+```
+
+```{r}
+df_chem_centered <- df_chem_centered %>%
+  mutate(race = relevel(race, ref = "white"))
+```
+
+```{r}
+model8 <- glm(early_delivery ~ . + dde:triglycerides + dde:cholesterol + pcb_sum_all:triglycerides + pcb_sum_all:cholesterol, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center),
+              family = "binomial")
+summary(model8)
+```
+
+```{r}
+car::vif(model8)
+```
+
+# TO DO
+
+make scores ordered categorical data?
+make smoking status factors
+make center factors
+
+interpreting vif
+justification of normalizing variables can help with multicolinearity.
+
+dummy variables for factors?
+
+Class bias?
+
+Potential of using factor models?
+
+Interpretation of residual plot
+
+Scale
+
+Variable selection?
+
+
+# Questions
+
+How to deal with missingness in scores, ordered discrete data.
+
+In what situations would we want to normalize data and is it always a good practice?
+
+How do we decide what variables to add together though?
+
+What unit is a significant unit?
+
+Dealing with LOD - 
+
+
+

@@ -1,0 +1,4 @@
+"0","p_4 <- binnedplot(x = df_no_albumin_imputed$sum_pcb_1 ,y = resid, nclass=NULL, "
+"0","                  xlab=""sum_pcb_1"", ylab=""Average residual"", "
+"0","                  main=""Binned residual plot: residual vs sum_pcb_1"", "
+"0","                  cex.pts=0.8, col.pts=1, col.int=""gray"")"

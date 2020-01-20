@@ -1,0 +1,4 @@
+"0","df_chem <- df %>% dplyr::select(dde:pcb_203, triglycerides, cholesterol, pcb_sum)"
+"0","df_cov <- df %>% dplyr::select(-(dde:pcb_203), -triglycerides, -cholesterol, -pcb_sum, -pcb_sum_2)"
+"0","df_chem_centered <- cbind(lapply(df_chem, function(x){scale(x, scale = FALSE)}),"
+"0","      df_cov)"

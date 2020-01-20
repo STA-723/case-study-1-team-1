@@ -1,0 +1,3 @@
+"0","model1 <- glm(early_delivery ~ ., "
+"0","              data = df %>% dplyr::select(dde:pcb_203, triglycerides, cholesterol, early_delivery),"
+"0","              family = ""binomial"")"

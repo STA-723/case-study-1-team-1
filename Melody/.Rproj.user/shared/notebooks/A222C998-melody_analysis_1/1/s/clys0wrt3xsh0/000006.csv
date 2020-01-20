@@ -1,0 +1,2 @@
+"0","df <- df %>% dplyr::select(-albumin) # remove albumin because of too many missing values"
+"0","df <- df %>% mutate(early_delivery = ifelse(gestational_age < 37, 1, 0))"

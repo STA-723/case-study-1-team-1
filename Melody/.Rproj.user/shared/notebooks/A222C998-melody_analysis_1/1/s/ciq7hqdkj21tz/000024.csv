@@ -1,0 +1,4 @@
+"0","binnedplot(x = df$pcb_203 ,y = resid, nclass=NULL, "
+"0","                  xlab=""pcb_203"", ylab=""Average residual"", "
+"0","                  main=""Binned residual plot: residual vs pcb_203"", "
+"0","                  cex.pts=0.8, col.pts=1, col.int=""gray"")"

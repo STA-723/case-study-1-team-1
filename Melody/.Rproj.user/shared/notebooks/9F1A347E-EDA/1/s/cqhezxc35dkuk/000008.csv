@@ -1,0 +1,6 @@
+"0","df_temp <- df_no_albumin %>% select(pcb_028:pcb_203, early_delivery) %>% melt()"
+"2","Using early_delivery as id variables
+"
+"0","ggplot(df_temp, aes(x=early_delivery, y=value, group=early_delivery)) + "
+"0","  geom_boxplot(aes(fill=early_delivery)) +"
+"0","  facet_grid(. ~ variable)"

@@ -1,0 +1,3 @@
+"0","# residual plot"
+"0","plot(pred.probs, resid, main=""Residual plot"", "
+"0","   xlab=""estimated probabilities"", ylab=""residual"", pch=19)"

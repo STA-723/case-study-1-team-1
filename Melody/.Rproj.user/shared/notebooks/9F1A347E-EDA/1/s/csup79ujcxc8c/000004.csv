@@ -1,0 +1,22 @@
+"0","model1 <- multinom(data = df_no_albumin_imputed, early_delivery ~ . - maternal_age_30)"
+"1","# weights: "
+"1"," "
+"1","28"
+"1"," ("
+"1","27"
+"1"," variable)
+"
+"1","initial  value 1649.690290 
+"
+"1","iter  10 value 1071.739923
+"
+"1","iter  20 value 242.747112
+"
+"1","iter  30 value 0.616864
+"
+"1","iter  40 value 0.000770
+"
+"1","final  value 0.000030 
+"
+"1","converged
+"

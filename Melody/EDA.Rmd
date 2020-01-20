@@ -1,0 +1,349 @@
+---
+title: "EDA"
+author: "Melody Jiang"
+date: "1/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(corrplot)
+library(mice) # missing data imputation
+library(nnet) #multinomial regression models
+library(broom)
+library(arm) # binned residual plot
+```
+
+```{r}
+df <- readRDS("Longnecker.rds")
+```
+
+```{r}
+summary(df)
+```
+
+```{r}
+df_no_albumin <- df %>% select(-albumin)
+```
+
+```{r}
+df_no_albumin <- df_no_albumin %>% mutate(early_delivery=cut(df_no_albumin$gestational_age, c(-Inf, 37, Inf), include.lowest = TRUE, , labels=c("early", "normal")))
+df_no_albumin <- df_no_albumin %>% mutate(maternal_age_30=cut(df_no_albumin$maternal_age, c(-Inf, 30, Inf), include.lowest = FALSE, , labels=c("30_and_below", "above_30")))
+df_no_albumin_imputed <- mice(df_no_albumin, m=1, maxit = 50, method = 'pmm', seed = 500)
+df_no_albumin_imputed <- complete(df_no_albumin_imputed, 1)
+```
+
+```{r}
+df_temp <- df_no_albumin %>% select(dde:triglycerides, cholesterol) %>% melt()
+ggplot(df_temp,aes(x = value)) + 
+    facet_wrap(~variable,scales = "free_x") + 
+    geom_histogram()
+```
+
+```{r}
+df_temp <- df_no_albumin %>% select(race:smoking_status, ) %>% melt()
+ggplot(df_temp,aes(x = value)) + 
+    facet_wrap(~variable,scales = "free_x") + 
+    geom_histogram()
+```
+
+```{r}
+ggplot(df_no_albumin, aes(x = early_delivery, y = dde, group = early_delivery)) +
+  geom_boxplot(aes(fill=early_delivery))
+```
+
+```{r}
+df_temp <- df_no_albumin %>% select(pcb_028:pcb_203, early_delivery) %>% melt()
+ggplot(df_temp, aes(x=early_delivery, y=value, group=early_delivery)) + 
+  geom_boxplot(aes(fill=early_delivery)) +
+  facet_grid(. ~ variable)
+```
+
+```{r}
+ggplot(df_no_albumin, aes(x = early_delivery, y = triglycerides, group = early_delivery)) +
+  geom_boxplot(aes(fill=early_delivery))
+```
+
+```{r}
+ggplot(data = df_no_albumin, aes(x = race, fill = df_no_albumin$early_delivery)) + 
+    geom_bar()
+```
+
+```{r}
+df_temp <- as.data.frame(table(df_no_albumin$race, df_no_albumin$early_delivery))
+ggplot(df_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
+    geom_bar(position = "fill",stat = "identity") +
+    # or:
+    # geom_bar(position = position_fill(), stat = "identity") 
+    scale_y_continuous(labels = scales::percent_format())
+```
+
+```{r}
+table(df_no_albumin$race, df_no_albumin$early_delivery)
+```
+
+```{r}
+slices <- c(160, 872) 
+lbls <- c("early", "normal")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+   main="Early deliveries in white")
+```
+
+```{r}
+slices <- c(335, 889) 
+lbls <- c("early", "normal")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+   main="Early deliveries in black")
+```
+
+```{r}
+slices <- c(27, 97) 
+lbls <- c("early", "normal")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+   main="Early deliveries in other races")
+```
+
+```{r}
+ggplot(data = df_no_albumin, aes(x = score_education, fill = early_delivery)) + 
+    geom_bar()
+```
+
+```{r}
+df_temp <- as.data.frame(table(df_no_albumin$score_education, df_no_albumin$early_delivery))
+ggplot(df_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
+  geom_bar(position = "fill",stat = "identity") +
+  # or:
+  # geom_bar(position = position_fill(), stat = "identity") 
+  scale_y_continuous(labels = scales::percent_format()) +
+  ggtitle("Percentage of early delivery versus education level")
+```
+
+```{r}
+ggplot(data = df_no_albumin, aes(x = score_income, fill = early_delivery)) + 
+    geom_bar()
+df_temp <- as.data.frame(table(df_no_albumin$score_income, df_no_albumin$early_delivery))
+ggplot(df_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
+  geom_bar(position = "fill",stat = "identity") +
+  # or:
+  # geom_bar(position = position_fill(), stat = "identity") 
+  scale_y_continuous(labels = scales::percent_format()) +
+  ggtitle("Percentage of early delivery versus income score")
+```
+
+```{r}
+ggplot(data = df_no_albumin, aes(x = score_occupation, fill = early_delivery)) + 
+    geom_bar()
+df_temp <- as.data.frame(table(df_no_albumin$score_occupation, df_no_albumin$early_delivery))
+ggplot(df_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
+  geom_bar(position = "fill",stat = "identity") +
+  # or:
+  # geom_bar(position = position_fill(), stat = "identity") 
+  scale_y_continuous(labels = scales::percent_format()) +
+  ggtitle("Percentage of early delivery versus occupation")
+```
+
+```{r}
+ggplot(data = df_no_albumin, aes(x = maternal_age, fill = early_delivery)) + 
+    geom_bar()
+```
+
+```{r}
+table(df_no_albumin$maternal_age_30, df_no_albumin$early_delivery)
+```
+
+```{r}
+slices <- c(428, 1551) 
+lbls <- c("early", "normal")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+   main="Early deliveries in mothers aged 30 and below")
+slices <- c(94, 307) 
+lbls <- c("early", "normal")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+   main="Early deliveries in mothers above 30")
+```
+
+```{r}
+ggplot(data = df_no_albumin, aes(x = smoking_status, fill = early_delivery)) + 
+    geom_bar()
+df_temp <- as.data.frame(table(df_no_albumin$smoking_status, df_no_albumin$early_delivery))
+ggplot(df_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
+  geom_bar(position = "fill",stat = "identity") +
+  # or:
+  # geom_bar(position = position_fill(), stat = "identity") 
+  scale_y_continuous(labels = scales::percent_format()) +
+  ggtitle("Percentage of early delivery versus smoking status")
+```
+
+```{r}
+ggplot(data = df_no_albumin, aes(x = center, fill = early_delivery)) + 
+    geom_bar()
+df_temp <- as.data.frame(table(df_no_albumin$center, df_no_albumin$early_delivery))
+ggplot(df_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
+  geom_bar(position = "fill",stat = "identity") +
+  # or:
+  # geom_bar(position = position_fill(), stat = "identity") 
+  scale_y_continuous(labels = scales::percent_format()) +
+  ggtitle("Percentage of early delivery versus center")
+```
+
+```{r}
+corrplot(cor(df_no_albumin_imputed %>% dplyr::select(dde:triglycerides, cholesterol)))
+```
+
+
+# Observations
+
+Chemicales are very skewed to the right.
+
+There is no visible difference in chemicales as of early delivery.
+
+Multicolinearity between pcb's -  might want to deal with this.
+
+
+# Initial Analysis
+
+We begin by building a multinomial logistic model that only includes the main eﬀects.
+
+```{r}
+model1 <- multinom(data = df_no_albumin_imputed, early_delivery ~ . - maternal_age_30)
+```
+
+```{r}
+tidy(model1)
+```
+
+We see statistically insignificat p-values.
+
+We look at binned residual plot for suggestions of model improvement.
+
+```{r}
+# Calculate predicted probabilities
+pred.probs <-  predict(model1,type="probs")
+resid <- if_else(df_no_albumin_imputed$early_delivery==1, 1, 0) - pred.probs
+```
+
+```{r}
+hist(pred.probs)
+```
+
+```{r}
+# binned residual plot for dde 
+p_1 <- binnedplot(x = df_no_albumin_imputed$dde ,y = resid, nclass=NULL, 
+                  xlab="dde", ylab="Average residual", 
+                  main="Binned residual plot: residual vs dde", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_2 <- binnedplot(x = df_no_albumin_imputed$pcb_028 ,y = resid, nclass=NULL, 
+                  xlab="pcb_028", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_028", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_3 <- binnedplot(x = df_no_albumin_imputed$pcb_153 ,y = resid, nclass=NULL, 
+                  xlab="pcb_153", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_153", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_3 <- binnedplot(x = df_no_albumin_imputed$cholesterol ,y = resid, nclass=NULL, 
+                  xlab="cholesterol", ylab="Average residual", 
+                  main="Binned residual plot: residual vs cholesterol", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+```
+
+
+# Dealing with multicolinearity in model
+```{r}
+df_no_albumin_imputed <- df_no_albumin_imputed %>% mutate(sum_pcb = pcb_074 + pcb_105 + pcb_118 + pcb_153 + pcb_138 + pcb_170 + pcb_180 + pcb_194 + pcb_203)
+```
+
+```{r}
+corrplot(cor(df_no_albumin_imputed %>% dplyr::select(dde, pcb_028, pcb_052, sum_pcb_1, sum_pcb_2, triglycerides, cholesterol)))
+```
+
+```{r}
+df <- df %>% mutate(gestational_age_factor = factor(ifelse(gestational_age < 37, "early", "normal")))
+df <- df %>% mutate(gestational_age_factor_2 = ifelse(gestational_age < 37, 1, 0))
+df_no_albumin_imputed <- cbind(df_no_albumin_imputed, df$gestational_age_factor_2)
+```
+
+```{r}
+dplyr::rename(df_no_albumin_imputed, df$gestational_age_factor_2 = gestational_age_factor_2)
+```
+
+```{r}
+model2 <- multinom(data = df_no_albumin_imputed, df$gestational_age_factor_2 ~ dde + pcb_028 + pcb_052 + sum_pcb_1 + sum_pcb_2 + triglycerides + cholesterol + race + score_education + score_income + score_occupation + maternal_age + smoking_status + center)
+```
+
+```{r}
+tidy(model2)
+```
+
+```{r}
+# Calculate predicted probabilities
+pred.probs <-  predict(model2,type="probs")
+resid <- if_else(df_no_albumin_imputed$"df$gestational_age_factor_2"==1, 1, 0) - pred.probs
+```
+
+```{r}
+# binned residual plot for dde 
+p_1 <- binnedplot(x = df_no_albumin_imputed$dde ,y = resid, nclass=NULL, 
+                  xlab="dde", ylab="Average residual", 
+                  main="Binned residual plot: residual vs dde", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_2 <- binnedplot(x = df_no_albumin_imputed$pcb_028 ,y = resid, nclass=NULL, 
+                  xlab="pcb_028", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_028", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_3 <- binnedplot(x = df_no_albumin_imputed$pcb_052 ,y = resid, nclass=NULL, 
+                  xlab="pcb_052", ylab="Average residual", 
+                  main="Binned residual plot: residual vs pcb_052", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_4 <- binnedplot(x = df_no_albumin_imputed$sum_pcb_1 ,y = resid, nclass=NULL, 
+                  xlab="sum_pcb_1", ylab="Average residual", 
+                  main="Binned residual plot: residual vs sum_pcb_1", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_5 <- binnedplot(x = df_no_albumin_imputed$sum_pcb_2 ,y = resid, nclass=NULL, 
+                  xlab="sum_pcb_2", ylab="Average residual", 
+                  main="Binned residual plot: residual vs sum_pcb_2", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_6 <- binnedplot(x = df_no_albumin_imputed$triglycerides ,y = resid, nclass=NULL, 
+                  xlab="triglycerides", ylab="Average residual", 
+                  main="Binned residual plot: residual vs triglycerides", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+p_7 <- binnedplot(x = df_no_albumin_imputed$cholesterol ,y = resid, nclass=NULL, 
+                  xlab="cholesterol", ylab="Average residual", 
+                  main="Binned residual plot: residual vs cholesterol", 
+                  cex.pts=0.8, col.pts=1, col.int="gray")
+```
+
+
+
+# Quesitons
+
+Multinomial logistic regression what does the "converged" do?
+
+Initial model including only main effects show insignificant p-values. What are some useful steps to take next?
+
+What is the output of a logistic regression here? Why do we use binned residual plot and how do we interpret them? How does binned residual plot work?
+
+Data is quite skewed. Mean imputation good?
+
+
+

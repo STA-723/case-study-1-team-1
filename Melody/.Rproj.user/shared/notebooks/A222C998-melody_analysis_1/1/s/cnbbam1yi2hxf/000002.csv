@@ -1,0 +1,2 @@
+"0","early.jitter <- jitter.binary (df$early_delivery)"
+"0","plot (df$dde, early.jitter)"

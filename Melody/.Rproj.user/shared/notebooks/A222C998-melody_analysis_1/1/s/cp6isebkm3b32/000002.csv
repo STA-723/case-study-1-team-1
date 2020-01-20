@@ -1,0 +1,36 @@
+"0","anova(model3, model5)"
+"1","Analysis of Deviance Table
+"
+"1","
+"
+"1","Model 1: early_delivery ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_170 + 
+    pcb_194 + pcb_203 + pcb_sum + triglycerides + cholesterol
+Model 2: early_delivery ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_170 + 
+    pcb_194 + pcb_203 + pcb_sum + triglycerides + cholesterol + 
+    dde:triglycerides + pcb_028:triglycerides + pcb_052:triglycerides + 
+    pcb_074:triglycerides + pcb_170:triglycerides + pcb_194:triglycerides + 
+    pcb_203:triglycerides + pcb_sum:triglycerides + dde:cholesterol + 
+    pcb_028:cholesterol + pcb_052:cholesterol + pcb_074:cholesterol + 
+    pcb_170:cholesterol + pcb_194:cholesterol + pcb_203:cholesterol + 
+    pcb_sum:cholesterol"
+"1","
+"
+"1"," "
+"1"," Resid. Df"
+"1"," Resid. Dev"
+"1"," Df"
+"1"," Deviance"
+"1","
+1"
+"1","      2368"
+"1","     1969.0"
+"1","   "
+"1","         "
+"1","
+2"
+"1","      2352"
+"1","     1952.1"
+"1"," 16"
+"1","   16.834"
+"1","
+"

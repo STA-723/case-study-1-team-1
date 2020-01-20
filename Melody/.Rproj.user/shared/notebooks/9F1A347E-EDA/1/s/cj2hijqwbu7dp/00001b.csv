@@ -1,0 +1,4 @@
+"0","p_6 <- binnedplot(x = df_no_albumin_imputed$triglycerides ,y = resid, nclass=NULL, "
+"0","                  xlab=""triglycerides"", ylab=""Average residual"", "
+"0","                  main=""Binned residual plot: residual vs triglycerides"", "
+"0","                  cex.pts=0.8, col.pts=1, col.int=""gray"")"

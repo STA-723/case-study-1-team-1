@@ -1,0 +1,1 @@
+"0","curve (invlogit (coef(model3) [1] + coef(model3) [2]*x), add=TRUE)"

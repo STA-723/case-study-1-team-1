@@ -1,0 +1,4 @@
+"0","p_7 <- binnedplot(x = df_no_albumin_imputed$cholesterol ,y = resid, nclass=NULL, "
+"0","                  xlab=""cholesterol"", ylab=""Average residual"", "
+"0","                  main=""Binned residual plot: residual vs cholesterol"", "
+"0","                  cex.pts=0.8, col.pts=1, col.int=""gray"")"

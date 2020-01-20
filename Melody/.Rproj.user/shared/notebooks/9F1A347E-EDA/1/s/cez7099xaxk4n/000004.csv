@@ -1,0 +1,7 @@
+"0","df_temp <- as.data.frame(table(df_no_albumin$center, df_no_albumin$early_delivery))"
+"0","ggplot(df_temp, aes(x = Var1, y = Freq, fill = Var2)) + "
+"0","  geom_bar(position = ""fill"",stat = ""identity"") +"
+"0","  # or:"
+"0","  # geom_bar(position = position_fill(), stat = ""identity"") "
+"0","  scale_y_continuous(labels = scales::percent_format()) +"
+"0","  ggtitle(""Percentage of early delivery versus center"")"

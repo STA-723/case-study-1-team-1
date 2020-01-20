@@ -1,0 +1,13 @@
+"0","p_1 <- binnedplot(x = df_no_albumin_imputed$dde ,y = resid, nclass=NULL, 
+                  xlab=""dde"", ylab=""Average residual"", 
+                  main=""Binned residual plot: residual vs dde"", 
+                  cex.pts=0.8, col.pts=1, col.int=""gray"")
+p_2 <- binnedplot(x = df_no_albumin_imputed$pcb_028 ,y = resid, nclass=NULL, 
+                  xlab=""pcb_028"", ylab=""Average residual"", 
+                  main=""Binned residual plot: residual vs pcb_028"", 
+                  cex.pts=0.8, col.pts=1, col.int=""gray"")
+"
+"0","p_3 <- binnedplot(x = df_no_albumin_imputed$pcb_052 ,y = resid, nclass=NULL, "
+"0","                  xlab=""pcb_052"", ylab=""Average residual"", "
+"0","                  main=""Binned residual plot: residual vs pcb_052"", "
+"0","                  cex.pts=0.8, col.pts=1, col.int=""gray"")"

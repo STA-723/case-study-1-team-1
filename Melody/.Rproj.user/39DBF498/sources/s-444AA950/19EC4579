@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1579225998459.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1397153741",
+    "id" : "19EC4579",
+    "lastKnownWriteTime" : 1579481250,
+    "last_content_update" : 1579481250306,
+    "path" : "~/Developer/STA 723/case-study-1-team-1/Melody/melody_analysis_1.Rmd",
+    "project_path" : "melody_analysis_1.Rmd",
+    "properties" : {
+        "cursorPosition" : "354,42",
+        "last_setup_crc32" : "444AA950bb338d19",
+        "scrollLine" : "351",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

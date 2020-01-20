@@ -1,0 +1,4 @@
+"0","df <- readRDS(""Longnecker.rds"")"
+"2","cannot open compressed file 'Longnecker.rds', probable reason 'No such file or directory'"
+"2","Error in gzfile(file, ""rb"") : cannot open the connection
+"

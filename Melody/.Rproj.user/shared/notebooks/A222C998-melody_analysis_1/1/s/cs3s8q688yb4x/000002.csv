@@ -1,0 +1,2 @@
+"0","pred.probs <-  predict(model3, type=""response"") # Calculate predicted probabilities"
+"0","resid <- if_else(df$early_delivery==1, 1, 0) - pred.probs # residuals"

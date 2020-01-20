@@ -1,0 +1,2 @@
+"0","ggplot(data = df_no_albumin, aes(x = score_occupation, fill = early_delivery)) + "
+"0","    geom_bar()"

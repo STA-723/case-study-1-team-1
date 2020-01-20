@@ -1,0 +1,55 @@
+---
+title: "EDA"
+author: "Melody Jiang"
+date: "1/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(reshape2)
+library(ggplot2)
+library(corrplot)
+```
+
+```{r}
+df <- readRDS("Longnecker.rds")
+```
+
+```{r}
+summary(df)
+```
+
+```{r}
+df_melt <- melt(df)
+```
+
+```{r}
+ggplot(df_melt,aes(x = value)) + 
+    facet_wrap(~variable,scales = "free_x") + 
+    geom_histogram()
+```
+
+```{r}
+corrplot(cor(df))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

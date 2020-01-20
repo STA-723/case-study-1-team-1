@@ -1,0 +1,18 @@
+"0","model2 <- multinom(data = df_no_albumin_imputed, df$gestational_age_factor_2 ~ dde + pcb_028 + pcb_052 + sum_pcb_1 + sum_pcb_2 + triglycerides + cholesterol + race + score_education + score_income + score_occupation + maternal_age + smoking_status + center)"
+"1","# weights: "
+"1"," "
+"1","17"
+"1"," ("
+"1","16"
+"1"," variable)
+"
+"1","initial  value 1649.690290 
+"
+"1","iter  10 value 1019.314542
+"
+"1","iter  20 value 963.180926
+"
+"1","final  value 963.170908 
+"
+"1","converged
+"
