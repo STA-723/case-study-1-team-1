@@ -70,6 +70,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 \begin{frame}
 \frametitle{Model}
 
@@ -95,7 +105,7 @@ $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_i(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 
 \item Frequentist model overestimates uncertainty.
 \item Bayesian Generalized Additive Model
-$$g(Y_i) = \beta_0 + \sum_{j=1}^m f_i(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
+$$g(Y_i) = \beta_0 + \sum_{j=1}^m f_j(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 
 \item Adds priors on the common regression coefficients, priors on the standard deviations of the smooth terms.
 
@@ -111,8 +121,9 @@ $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_i(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 
 \begin{itemize}
 
-
-\item Mixed Effect / Random Effect
+\item Deal with different centers
+\item Approach 1: Bayesian Hierarchical Model
+\item Approach 2: Mixed Effect / Random Effect Model
 \item Generalized Additive Mixed Model (GAMM)
 \item Bayesian GAMM 
 
