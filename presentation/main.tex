@@ -75,6 +75,24 @@
 
 
 
+\begin{frame}
+\frametitle{Model}
+
+
+\begin{itemize}
+\item Linear regression or logistic regression?
+\pause
+\item Too simple $\&$ Can't fit nonlinear trend.
+\pause
+\item Domain knowledge?
+\pause
+\item Chemicals have no effect when concentration is lower than a bound.
+\pause
+\item Chemicals have constant effect when concentration is higher than a bound.
+\pause
+\item Nonlinear Model
+\end{itemize}
+\end{frame}
 
 
 
@@ -89,14 +107,14 @@
 \begin{frame}
 \frametitle{Model}
 
-\begin{itemize}
 
+\begin{itemize}
 \item Generalized Additive Model (GAM)
 $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_i(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 
 \item Choice of $g$: probit or logit.
-\item $x_{.j}$s include DDE, PCBs.
-\item $z_{.k}$s include categorical variables and confounding variables.
+\item $x_{.j}$s include DDE, PCBs, maternal age, etc.
+\item $z_{.k}$s include categorical variables and some confounding variables.
 
 \end{itemize}
 \end{frame}
@@ -109,7 +127,8 @@ $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_i(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 
 \begin{itemize}
 
-\item Frequentist model overestimates uncertainty.
+\item Frequentist approach may overestimate uncertainty.
+\item Frequentist GAM may produce a non-significant p-value.
 \pause
 \item Bayesian Generalized Additive Model
 $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_j(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
@@ -148,7 +167,7 @@ $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_j(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 \begin{itemize}
 
 
-\item Monotone effect: Bayesian Isotonic Regression (Neelon, B. and Dunson, D.B. 2004)
+\item Specialized prior may give narrower credible intervals.
 \pause
 \item Including Interactions: Bayesian Factor Analysis (Ferrari, F. and Dunson, D.B. 2019)
 
