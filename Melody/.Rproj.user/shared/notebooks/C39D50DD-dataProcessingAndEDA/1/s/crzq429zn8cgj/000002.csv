@@ -1,0 +1,3 @@
+"0","ggplot(dat, aes(x = race, y = as.matrix(dat %>% dplyr::select(pcb_028:pcb_203)) %*% as.vector(pca$loadings[,1]), group = race)) +"
+"0","  geom_boxplot(aes(fill=race)) + "
+"0","  labs(fill = ""race"", x = ""race"", y = ""weighted sum of pcb by first column of loadings matrix"")"

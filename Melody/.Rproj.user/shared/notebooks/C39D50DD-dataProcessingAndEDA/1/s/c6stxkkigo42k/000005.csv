@@ -1,0 +1,7 @@
+"0","# race and early delivery"
+"0","dat_temp <- as.data.frame(table(dat$race, dat$ind_37))"
+"0","ggplot(dat_temp, aes(x = Var1, y = Freq, fill = Var2)) + "
+"0","    geom_bar(position = ""fill"",stat = ""identity"") +"
+"0","    # or:"
+"0","    # geom_bar(position = position_fill(), stat = ""identity"") "
+"0","    scale_y_continuous(labels = scales::percent_format())"

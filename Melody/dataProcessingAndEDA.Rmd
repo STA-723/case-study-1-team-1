@@ -58,11 +58,28 @@ ggplot(dat, aes(x = ind_37, y = as.matrix(dat %>% dplyr::select(pcb_028:pcb_203)
   labs(fill = "early delivery", x = "early delivery", y = "weighted sum of pcb by first column of loadings matrix")
 ```
 
+```{r}
+# race and early delivery
+dat_temp <- as.data.frame(table(dat$race, dat$ind_37))
+ggplot(dat_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
+    geom_bar(position = "fill",stat = "identity") +
+    # or:
+    # geom_bar(position = position_fill(), stat = "identity") 
+    scale_y_continuous(labels = scales::percent_format())
+```
 
+```{r}
+# dde by race
+ggplot(dat, aes(x = race, y = dde, group = race)) +
+  geom_boxplot(aes(fill=race)) + 
+  labs(fill = "race", x = "race")
+```
 
-
-
-
+```{r}
+ggplot(dat, aes(x = race, y = as.matrix(dat %>% dplyr::select(pcb_028:pcb_203)) %*% as.vector(pca$loadings[,1]), group = race)) +
+  geom_boxplot(aes(fill=race)) + 
+  labs(fill = "race", x = "race", y = "weighted sum of pcb by first column of loadings matrix")
+```
 
 
 

@@ -40,11 +40,8 @@
 \frametitle{EDA and Preprocessing}
 \begin{itemize}
 \item Premature delivery: Gestational Age $\leq$ 36.
-\pause
 \item Standardize continuous variables.
-\pause
 \item Missing data: Multivariate Imputations by Chained Equations (MICE package in R) for covariates. Deleted albumin because 93 percent missing. Only one observation missing in dde and pcb, deleted.
-\pause
 \item Limit of Detection (LOD): Exists in some PCBs. All LODs are negligible compared to data scale (e.g. 0.01 compared to 0.3)
 \end{itemize}
 \end{frame}
@@ -57,7 +54,6 @@
 
     \begin{itemize}
         \item There are 11 types of PCBs, some of which have high correlation and might distort modeling result.
-        \pause
         \item  \includegraphics[scale=0.4]{corrplot.png}
         \item Possible approaches: Simple sum, PCA, Factor Analysis.
     \end{itemize}
@@ -69,7 +65,6 @@
 
     \begin{itemize}
         \item Possible approaches: Simple sum, PCA, Factor Analysis.
-        \pause
         \item \includegraphics[scale=0.4]{PCA.png}
 
 

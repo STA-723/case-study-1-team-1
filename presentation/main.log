@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  20 JAN 2020 18:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  20 JAN 2020 18:42
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -682,56 +682,46 @@ File: ot1mathkerncmss.fd 2013/03/27 Fontinst v1.933 font definitions for OT1/mat
 
 ] [3
 
-] [4
-
-] [5
-
-] [6
-
 ]
-<corrplot.png, id=172, 403.5075pt x 394.47375pt>
+<corrplot.png, id=96, 403.5075pt x 394.47375pt>
 File: corrplot.png Graphic file (type png)
 <use corrplot.png>
-Package pdftex.def Info: corrplot.png  used on input line 65.
+Package pdftex.def Info: corrplot.png  used on input line 61.
 (pdftex.def)             Requested size: 161.40013pt x 157.7867pt.
- [7
+ [4
 
  </Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/corrplot.png>]
-File: corrplot.png Graphic file (type png)
-<use corrplot.png>
-Package pdftex.def Info: corrplot.png  used on input line 65.
-(pdftex.def)             Requested size: 161.40013pt x 157.7867pt.
- [8
-
-]
-<PCA.png, id=226, 670.505pt x 373.395pt>
+<PCA.png, id=124, 670.505pt x 373.395pt>
 File: PCA.png Graphic file (type png)
 <use PCA.png>
-Package pdftex.def Info: PCA.png  used on input line 77.
+Package pdftex.def Info: PCA.png  used on input line 72.
 (pdftex.def)             Requested size: 268.19725pt x 149.35535pt.
- [9
+ [5
 
  </Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/PCA.png>]
-File: PCA.png Graphic file (type png)
-<use PCA.png>
-Package pdftex.def Info: PCA.png  used on input line 77.
-(pdftex.def)             Requested size: 268.19725pt x 149.35535pt.
- [10
-
-]
-<ddeVSearly.png, id=279, 416.55624pt x 403.5075pt>
+<ddeVSearly.png, id=152, 416.55624pt x 403.5075pt>
 File: ddeVSearly.png Graphic file (type png)
 <use ddeVSearly.png>
-Package pdftex.def Info: ddeVSearly.png  used on input line 88.
+Package pdftex.def Info: ddeVSearly.png  used on input line 83.
 (pdftex.def)             Requested size: 150.57372pt x 145.85982pt.
-<pcbVSearly.png, id=280, 416.55624pt x 403.5075pt>
+<pcbVSearly.png, id=153, 416.55624pt x 403.5075pt>
 File: pcbVSearly.png Graphic file (type png)
 <use pcbVSearly.png>
-Package pdftex.def Info: pcbVSearly.png  used on input line 88.
+Package pdftex.def Info: pcbVSearly.png  used on input line 83.
 (pdftex.def)             Requested size: 150.57372pt x 145.85982pt.
- [11
+ [6
 
- </Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/ddeVSearly.png> </Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/pcbVSearly.png>] [12
+ </Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/ddeVSearly.png> </Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/pcbVSearly.png>] [7
+
+] [8
+
+] [9
+
+] [10
+
+] [11
+
+] [12
 
 ] [13
 
@@ -751,16 +741,6 @@ Package pdftex.def Info: pcbVSearly.png  used on input line 88.
 
 ] [21
 
-] [22
-
-] [23
-
-] [24
-
-] [25
-
-] [26
-
 ]
 \tf@nav=\write6
 \openout6 = `main.nav'.
@@ -771,27 +751,27 @@ Package pdftex.def Info: pcbVSearly.png  used on input line 88.
 \tf@snm=\write8
 \openout8 = `main.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 212.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 212.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 207.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 207.
  (/Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 212.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 212.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 207.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 207.
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 16884 strings out of 492649
- 322045 string characters out of 6129622
+ 16874 strings out of 492649
+ 321950 string characters out of 6129622
  397687 words of memory out of 5000000
  20337 multiletter control sequences out of 15000+600000
  10390 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  56i,14n,55p,838b,555s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on "/Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/main.pdf" (26 pages, 473943 bytes).
+Output written on "/Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/main.pdf" (21 pages, 464864 bytes).
 PDF statistics:
- 739 PDF objects out of 1000 (max. 8388607)
- 680 compressed objects within 7 object streams
- 53 named destinations out of 1000 (max. 500000)
+ 611 PDF objects out of 1000 (max. 8388607)
+ 558 compressed objects within 6 object streams
+ 43 named destinations out of 1000 (max. 500000)
  63 words of extra memory for PDF output out of 10000 (max. 10000000)
 
