@@ -2,18 +2,142 @@
 
 \usepackage[utf8]{inputenc}
 
-\title{Sample title}
-\author{Anonymous}
-\institute{ShareLaTeX}
-\date{2014}
+\title{Case Study 1-Group 1}
+\author{Melody Jiang, Irene Ji, Keru Wu}
+\institute{Department of Statistical Science, Duke University}
+\date{01/21/2019}
 
 \begin{document}
 
 \frame{\titlepage}
 
+
+
+%%%%%%%%%% Section1: Introduction %%%%%%%%%%%
+
+
 \begin{frame}
-\frametitle{Sample frame title}
-This is a text in first frame. This is a text in first frame. This is a text in first frame.
+\frametitle{Introduction}
+
+\begin{itemize}
+\item Data: A study by Longnecker et al. (2001), comprised of 2380 observations of pregnant women.
+  
+\item Goal: Assess how DDE and PCBs relate to risk of premature delivery.
+
+\end{itemize}
+
 \end{frame}
+
+
+
+
+
+
+%%%%%%%%%% Section2: Materials & Methods %%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Data Preprocessing}
+\begin{itemize}
+
+\item Preterm birth: Gestational Age $\leq$ 36.
+\item Standardize continuous variables.
+\item Missing data: Multivariate Imputations by Chained Equations (MICE package in R). 
+\item Limit of Detection (LOD): Exists in some PCBs. All LODs are negligible compared to data scale (e.g. 0.01 compared to 0.3)
+
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{Collinearity \& Dimensionality Reduction}
+
+\begin{itemize}
+
+\item There are 11 types of PCBs, some of which have high correlation and may be redundant.
+\item Possible approaches: Simple sum, PCA, Factor Analysis .
+\item Alternative approach: model with regularization (e.g. LASSO).
+\item Check Multicollinearity: Variation Inflation Factor (VIF).
+
+\end{itemize}
+\end{frame}
+
+
+
+
+
+
+
+
+\begin{frame}
+\frametitle{Model}
+
+\begin{itemize}
+
+\item Generalized Additive Model (GAM)
+$$g(Y_i) = \beta_0 + \sum_{j=1}^m f_i(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
+
+\item Choice of $g$: probit or logit.
+\item $x_{.j}$s include DDE, PCBs.
+\item $z_{.k}$s include categorical variables and confounding variables.
+
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{Model}
+
+\begin{itemize}
+
+\item Frequentist model overestimates uncertainty.
+\item Bayesian Generalized Additive Model
+$$g(Y_i) = \beta_0 + \sum_{j=1}^m f_i(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
+
+\item Adds priors on the common regression coefficients, priors on the standard deviations of the smooth terms, and a prior on the decomposition of the covariance matrices of any group-specific parameters
+
+
+\end{itemize}
+\end{frame}
+
+
+
+
+
+
+\begin{frame}
+\frametitle{Discussion}
+
+\begin{itemize}
+
+\item Monotone effect: Bayesian Isotonic Regression (Neelon, B. and Dunson, D.B. 2004)
+\item Including Interactions: Bayesian Factor Analysis (Ferrari, F. and Dunson, D.B. 2019)
+
+
+
+\end{itemize}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \end{document}
