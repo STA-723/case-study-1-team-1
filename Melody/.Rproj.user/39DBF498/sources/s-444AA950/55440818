@@ -12,12 +12,12 @@
     "path" : "~/Developer/STA 723/case-study-1-team-1/Melody/EDA.Rmd",
     "project_path" : "EDA.Rmd",
     "properties" : {
-        "cursorPosition" : "38,59",
+        "cursorPosition" : "57,40",
         "last_setup_crc32" : "444AA950bb338d19",
-        "scrollLine" : "29",
+        "scrollLine" : "52",
         "tempName" : "Untitled1"
     },
-    "relative_order" : 1,
+    "relative_order" : 3,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_markdown"

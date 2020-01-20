@@ -25,16 +25,38 @@ imp = mice(dat)
 dat = complete(imp)
 
 dat$ind_37 = dat$gestational_age < 37
-dat[,c(1:12,13,15,16,17,18,20)] = scale(dat[,c(1:12,13,15,16,17,18,20)])
+
+dat[,c(1:12,13,15,16,17,18,20)] = scale(dat[,c(1:12,13,15,16,17,18,20)]) # standardize
 ```
 
 ```{r}
-
+dat_orig = readRDS("Longnecker.rds")
+summary(dat_orig)
 ```
 
+```{r}
+corrplot::corrplot(cor(dat %>% dplyr::select(dde, pcb_028:pcb_203, triglycerides, cholesterol, ind_37)))
+```
 
+```{r}
+ggplot(dat, aes(x = ind_37, y = dde, group = ind_37)) +
+  geom_boxplot(aes(fill=ind_37)) + 
+  labs(fill = "early delivery", x = "early delivery")
+```
 
+```{r}
+pca = princomp(dat[,2:12])
+pcb = as.matrix(dat[,2:12])
+pcb_pc = pcb %*% pca$loadings
+print(pca$loadings)
+summary(pca)
+```
 
+```{r}
+ggplot(dat, aes(x = ind_37, y = as.matrix(dat %>% dplyr::select(pcb_028:pcb_203)) %*% as.vector(pca$loadings[,1]), group = ind_37)) +
+  geom_boxplot(aes(fill=ind_37)) + 
+  labs(fill = "early delivery", x = "early delivery", y = "weighted sum of pcb by first column of loadings matrix")
+```
 
 
 

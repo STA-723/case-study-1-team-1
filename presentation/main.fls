@@ -291,6 +291,22 @@ INPUT /usr/local/texlive/2018/texmf-dist/tex/latex/sansmathaccent/ot1mathkerncms
 INPUT /usr/local/texlive/2018/texmf-dist/fonts/tfm/public/sansmathaccent/mathkerncmssi10.tfm
 INPUT /usr/local/texlive/2018/texmf-dist/fonts/tfm/public/sansmathaccent/mathkerncmssi8.tfm
 INPUT /usr/local/texlive/2018/texmf-dist/fonts/tfm/public/sansmathaccent/mathkerncmssi8.tfm
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/corrplot.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/corrplot.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/corrplot.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/corrplot.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/corrplot.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/PCA.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/PCA.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/PCA.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/PCA.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/PCA.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/ddeVSearly.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/ddeVSearly.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/ddeVSearly.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/pcbVSearly.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/pcbVSearly.png
+INPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/pcbVSearly.png
 OUTPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/main.nav
 OUTPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/main.toc
 OUTPUT /Users/yufeng/Developer/STA 723/case-study-1-team-1/presentation/main.snm

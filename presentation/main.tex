@@ -1,6 +1,7 @@
 \documentclass{beamer}
 
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
 
 \title{Case Study 1-Group 1}
 \author{Melody Jiang, Irene Ji, Keru Wu}
@@ -20,9 +21,9 @@
 \frametitle{Introduction}
 
 \begin{itemize}
-\item Data: A study by Longnecker et al. (2001), comprised of 2380 observations of pregnant women.
+\item Data: Subset of National Collaborative Perinatal Project (CPP), comprised of 2380 observations of pregnant women [Longnecker et al., 2001].
   
-\item Goal: Assess how DDE and PCBs relate to risk of premature delivery.
+\item Goal: Assess how DDE and PCBs associate with risk of premature delivery, adjusting for confounding variables.
 
 \end{itemize}
 
@@ -36,17 +37,15 @@
 %%%%%%%%%% Section2: Materials & Methods %%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Data Preprocessing}
+\frametitle{EDA and Preprocessing}
 \begin{itemize}
-
-\item Preterm birth: Gestational Age $\leq$ 36.
+\item Premature delivery: Gestational Age $\leq$ 36.
 \pause
 \item Standardize continuous variables.
 \pause
-\item Missing data: Multivariate Imputations by Chained Equations (MICE package in R) for covariates. Only one missing in continuous, deleted.
+\item Missing data: Multivariate Imputations by Chained Equations (MICE package in R) for covariates. Deleted albumin because 93 percent missing. Only one observation missing in dde and pcb, deleted.
 \pause
 \item Limit of Detection (LOD): Exists in some PCBs. All LODs are negligible compared to data scale (e.g. 0.01 compared to 0.3)
-
 \end{itemize}
 \end{frame}
 
@@ -54,22 +53,39 @@
 
 
 \begin{frame}
-\frametitle{Collinearity \& Dimensionality Reduction}
+    \frametitle{EDA and Preprocessing: Collinearity and Dimensionality Reduction}
 
-\begin{itemize}
+    \begin{itemize}
+        \item There are 11 types of PCBs, some of which have high correlation and might distort modeling result.
+        \pause
+        \item  \includegraphics[scale=0.4]{corrplot.png}
+        \item Possible approaches: Simple sum, PCA, Factor Analysis.
+    \end{itemize}
 
-\item There are 11 types of PCBs, some of which have high correlation and may be redundant.
-\pause
-\item Possible approaches: Simple sum, PCA, Factor Analysis.
-\pause
-\item Check Multicollinearity: Variation Inflation Factor (VIF).
+\end{frame}
 
-\end{itemize}
+\begin{frame}
+    \frametitle{EDA and Preprocessing: Collinearity and Dimensionality Reduction}
+
+    \begin{itemize}
+        \item Possible approaches: Simple sum, PCA, Factor Analysis.
+        \pause
+        \item \includegraphics[scale=0.4]{PCA.png}
+
+
+    \end{itemize}
 \end{frame}
 
 
+\begin{frame}
+    \frametitle{EDA and Preprocessing}
 
-
+    
+    \includegraphics[width=0.49\textwidth]{ddeVSearly.png}
+    \includegraphics[width=0.49\textwidth]{pcbVSearly.png}
+    
+        
+\end{frame}
 
 
 
