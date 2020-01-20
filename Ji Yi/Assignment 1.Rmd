@@ -1,0 +1,315 @@
+---
+output: pdf_document
+---
+# Case Study 1: National Collaborative Perinatal Project
+
+## Background
+The data are taken from the National Collaborative Perinatal Project (CPP). Women were enrolled during pregnancy through different medical centers and then the kids were followed in order to collect both pregnancy and childhood development outcomes. We consider a subsample of 2380 women and children for this analysis, which was studied by [Longnecker et al., 2001].  A particular focus of the Longnecker et al substudy was in assaying serum samples from the original larger study to obtain information on exposures in order to assess the relationship between these exposures to the women and adverse pregnancy and developmental outcomes in their children.  Two exposures of particular interest are Dichlorodiphenyldichloroethylene (DDE) and Polychlorinated Biphenyls (PCBs), which are breakdown products in the body of chemicals that have been historically used to treat crops to protect them from predation.  These chemicals persist in the environment and are lipophilic, building up in fatty deposits in human tissues.  Hence, each of us carries around our own body burden of these chemicals, potentially impacting our health.
+
+## The data
+The dataset contains demographic variables, such as race, age, and socio-economic index, along with smoking status and concentration doses for DDE and PCBs.  In addition, data are available on levels of cholesterol and triglycerides in serum; these variables are relevant since DDE/PCBs are stored in fat and cholesterol/triglycerides provide measurements of the levels of circulating fats (being somewhat informal) in serum. 
+
+## Goal
+The overarching goal of the analysis is to assess how DDE and PCBs relate to risk of premature delivery.  Premature delivery is typically defined as a gestational age at delivery of 37 weeks or less, but it is important to note that deliveries occurring right at the cutoff have similar clinical outcomes to full term deliveries, while deliveries occurring substantially less than 37 weeks (early preterm) are associated with substantial risk of short and long term morbidity and mortality.  Ideally we would like to infer a causal effect of these exposures on risk of premature deliveries of different severities, while investigating the dose response relationship.  However, these data are not collected in a randomized trial but are the result of an observational epidemiology study.  Hence, epidemiologists typically focus on assessing associations, while adjusting for covariates that may confound exposure-outcome relationships.  In addressing the above interests, it is important to take into account heterogeneity across study centers.
+
+## Variable key 
+gestational_age = gestational age (in weeks)
+
+dde = concentration of dde (ug/dL)
+
+pcb_* = concentration of pcb_* (ng/dL)
+
+albumin = concentration of albumin (g/dL)
+
+cholesterol = concentration of cholesterol (g/dL)
+
+triglycerides =  concentration of triglycerides (g/dL)
+
+race 
+
+score_education 
+
+score_income
+
+score_occupation
+
+maternal_age = age of mother
+
+smoking_status = mother smoking
+
+center
+
+```{r Read In Data}
+# Load in data & remove data point with missing PCB information
+dat <- readRDS("Longnecker.rds")
+which(is.na(dat$pcb_028)==TRUE)
+dat[1861,]
+dat <- dat[-1861,]
+dat$race <- as.factor(dat$race)
+dat$smoking_status <- as.factor(dat$smoking_status)
+dat$center <- as.factor(dat$center)
+attach(dat)
+```
+
+```{r EDA}
+# Histograms
+library(reshape2)
+library(ggplot2)
+d <- melt(dat[,c(1:12,22,14,16,17,18,19,21)])
+ggplot(d,aes(x = value)) + 
+    facet_wrap(~variable,scales = "free_x") + 
+    geom_histogram()
+
+# # Log-transformation
+# library(dplyr)
+# log_d <- d
+# log_d <- mutate(log_d,value = log(value))
+# ggplot(log_d,aes(x = value)) + 
+#     facet_wrap(~variable,scales = "free_x") + 
+#     geom_histogram()
+
+# Boxplots
+ggplot(dat, aes(group=race, x=race, y=gestational_age)) + 
+  geom_boxplot()
+ggplot(dat, aes(group=smoking_status, x=smoking_status, y=gestational_age)) + 
+  geom_boxplot()
+ggplot(dat, aes(group=center, x=center, y=gestational_age)) + 
+  geom_boxplot()
+
+# Conditioning Plots
+library(graphics)
+coplot(gestational_age ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_105 + pcb_118 + pcb_153 + pcb_170 + pcb_138 + pcb_180 + pcb_194 + pcb_203| race, data = dat)
+coplot(gestational_age ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_105 + pcb_118 + pcb_153 + pcb_170 + pcb_138 + pcb_180 + pcb_194 + pcb_203| smoking_status, data = dat)
+coplot(gestational_age ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_105 + pcb_118 + pcb_153 + pcb_170 + pcb_138 + pcb_180 + pcb_194 + pcb_203| center, data = dat)
+
+# Correlation Plot
+library(corrplot)
+corrplot(cor(dat[c(1:12,22)]))
+
+# Summary Statistics
+summary(dat)
+```
+
+### Binary outcomes
+
+```{r Missing Data Combine pcb}
+dat0 <- dat
+library(dplyr)
+# Indicator for preterm
+dat <- dat %>%
+       mutate(ind_gest37 = if_else(gestational_age<37,1,0))
+
+# Combine all pcb columns
+pcb_col <- grep("pcb", names(dat))
+dat <- dat %>%
+  mutate(pcb_total = apply(dat[,pcb_col], 1, sum))
+
+library(mice)
+apply(is.na(dat), 2, sum) 
+# remove albumin; impute score_education, score_income, score_occupation
+dat_mice <- mice(dat[,-13], seed = 12345)
+# complete(dat_mice)
+
+# Further EDA
+d <- melt(complete(dat_mice))
+ggplot(d,aes(x = value)) + 
+    facet_wrap(~variable,scales = "free_x") + 
+    geom_histogram()
+corrplot(cor(complete(dat_mice)[,c(1,13,15:18,20,23:24)]))
+```
+
+```{r Logistic}
+pcb_col <- grep("pcb", names(dat0))
+pcb_colnames <- paste(colnames(dat0)[pcb_col], collapse = "+",sep = "")
+confound_colnames <- paste(colnames(dat0[c(14:21,23)]),collapse = "+", sep = "")
+full_formula_ind <- as.formula(paste("ind_gest37~dde+",pcb_colnames, "+", confound_colnames, seq = ""))
+# fit2 <- glm(full_formula_ind, data = dat, family = "binomial"(link="logit"))
+fit1 <- with(data = dat_mice, exp = glm(ind_gest37 ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_105 + pcb_118 + pcb_153 + pcb_170 + pcb_138 + pcb_180 + pcb_194 + pcb_203 + 
+    triglycerides + race + score_education + score_income + score_occupation + 
+    maternal_age + smoking_status + cholesterol + center, family  = "binomial"(link="logit"))) 
+fit1_pool <- pool(fit1)
+summary(fit1_pool)
+
+fit2 <- glm(full_formula_ind, data = complete(dat_mice), 
+            family = "binomial"(link="logit"))
+dat2 <- complete(dat_mice) %>% 
+        mutate(Residuals = residuals.glm(fit2,type="response"), 
+         Predicted = predict.glm(fit2,type="response"))
+library(arm)
+binnedplot(x=dat2$Predicted,y=dat2$Residuals,
+           xlab="Predicted Probabilities")
+```
+
+```{r Combine pcbs Logistic}
+fit1.1 <- with(data = dat_mice, exp = glm(ind_gest37 ~ dde + pcb_total + 
+    triglycerides + race + score_education + score_income + score_occupation + 
+    maternal_age + smoking_status + cholesterol + center,
+    family = "binomial"(link="logit"))) 
+fit1.1_pool <- pool(fit1.1)
+summary(fit1.1_pool)
+
+fit2.1 <- glm(ind_gest37 ~ dde + pcb_total + 
+    triglycerides + race + score_education + score_income + score_occupation + 
+    maternal_age + smoking_status + cholesterol + center, data = complete(dat_mice), 
+            family = "binomial"(link="logit"))
+dat2.1 <- complete(dat_mice) %>% 
+        mutate(Residuals = residuals.glm(fit2.1,type="response"), 
+         Predicted = predict.glm(fit2.1,type="response"))
+library(arm)
+binnedplot(x=dat2.1$Predicted,y=dat2.1$Residuals,
+           xlab="Predicted Probabilities")
+
+```
+
+
+
+### Multi-level outcomes
+
+```{r Missing Data Combine pcb 2}
+dat0 <- dat
+library(dplyr)
+# Indicator for preterm
+dat <- dat %>%
+       mutate(preterm_ind = if_else(gestational_age<33,2,
+                                    if_else(gestational_age<37 & 
+                                              gestational_age>32,1,0)))
+
+# Combine all pcb columns
+pcb_col <- grep("pcb", names(dat))
+dat <- dat %>%
+  mutate(pcb_total = apply(dat[,pcb_col], 1, sum))
+
+library(mice)
+apply(is.na(dat), 2, sum) 
+# remove albumin; impute score_education, score_income, score_occupation
+dat_mice <- mice(dat[,-13], seed = 12345)
+imp_dat <- complete(dat_mice)
+
+# Further EDA
+d <- melt(imp_dat)
+ggplot(d,aes(x = value)) + 
+    facet_wrap(~variable,scales = "free_x") + 
+    geom_histogram()
+corrplot(cor(imp_dat[,c(1,13,15:18,20,23:24)]))
+```
+
+```{r Logistic 2}
+pcb_col <- grep("pcb", names(dat0))
+pcb_colnames <- paste(colnames(dat0)[pcb_col], collapse = "+",sep = "")
+confound_colnames <- paste(colnames(dat0[c(14:21,23)]),collapse = "+", sep = "")
+full_formula_ind <- as.formula(paste("preterm_ind~dde+",pcb_colnames, "+", confound_colnames, seq = ""))
+
+library(nnet)
+library(broom)
+fit1 <- multinom(full_formula_ind, data = imp_dat)
+tidy(fit1,exponentiate=FALSE) #display log-odds model
+
+# calculate predicted probabilities
+pred.probs <- predict(fit1,type="probs")
+
+# calculate residuals for category j
+very_preterm <- if_else(imp_dat$preterm_ind==2,1,0)
+residual_very_preterm <- very_preterm - pred.probs[,3]
+
+preterm <- if_else(imp_dat$preterm_ind==1,1,0)
+residual_preterm <- preterm - pred.probs[,2]
+
+library(arm)
+binnedplot(x=imp_dat$dde,y=residual_very_preterm,
+           xlab="Predicted Probabilities")
+
+binnedplot(x=imp_dat$dde,y=preterm,
+           xlab="Predicted Probabilities")
+```
+
+```{r Combine pcbs Logistic 2}
+fit2 <- multinom(preterm_ind ~ dde + pcb_total + triglycerides + race + score_education + score_income + score_occupation + maternal_age + smoking_status + cholesterol +
+center, data = imp_dat)
+tidy(fit2,exponentiate=FALSE) #display log-odds model
+
+# calculate predicted probabilities
+pred.probs <- predict(fit2,type="probs")
+
+# calculate residuals for category j
+very_preterm <- if_else(imp_dat$preterm_ind==2,1,0)
+residual_very_preterm <- very_preterm - pred.probs[,3]
+
+preterm <- if_else(imp_dat$preterm_ind==1,1,0)
+residual_preterm <- preterm - pred.probs[,2]
+
+library(arm)
+binnedplot(x=imp_dat$dde,y=residual_very_preterm,
+           xlab="Predicted Probabilities")
+
+binnedplot(x=imp_dat$dde,y=preterm,
+           xlab="Predicted Probabilities") # residual plot!!
+
+binnedplot(x=imp_dat$pcb_total,y=residual_very_preterm,
+           xlab="Predicted Probabilities")
+
+binnedplot(x=imp_dat$pcb_total,y=residual_preterm,
+           xlab="Predicted Probabilities")
+
+anova(fit1, fit2, test="Chisq")
+```
+
+try ordinal logistic regression? (polr)
+
+
+### Multi-level outcomes & PCA
+
+```{r Missing Data Combine pcb PCA}
+dat0 <- dat
+library(dplyr)
+# Indicator for preterm
+dat <- dat %>%
+       mutate(preterm_ind = if_else(gestational_age<33,2,
+                                    if_else(gestational_age<37 & 
+                                              gestational_age>32,1,0)))
+
+# Data Imputation (MICE - Predictive Mean Matching)
+library(mice)
+apply(is.na(dat), 2, sum) 
+# remove albumin; impute score_education, score_income, score_occupation
+dat_mice <- mice(dat[,-13], seed = 12345)
+imp_dat <- complete(dat_mice)
+
+# PCA
+pcb_col <- grep("pcb", names(imp_dat))
+pcb.pca <- prcomp(imp_dat[,pcb_col], center = TRUE, scale. = TRUE)
+summary(pcb.pca)
+
+# Further EDA
+d <- melt(imp_dat)
+ggplot(d,aes(x = value)) + 
+    facet_wrap(~variable,scales = "free_x") + 
+    geom_histogram()
+corrplot(cor(imp_dat[,c(1,13,15:18,20,23:24)]))
+```
+
+
+
+
+
+
+```{r Codes for later reference}
+# # Extract PCB columns & Create full formula
+# pcb_col <- grep("pcb", names(dat))
+# pcb_colnames <- paste(colnames(dat)[pcb_col], collapse = "+",sep = "")
+# confound_colnames <- paste(colnames(dat[c(14:21,23)]),collapse = "+", sep = "")
+# full_formula <- as.formula(paste("gestational_age~dde+",pcb_colnames, "+", confound_colnames, seq = ""))
+
+# # Remove pcb138 (collinearity)
+# pcb_colnames_no138 <- gsub("\\+pcb_138", "", pcb_colnames)
+# full_formula_no138 <- as.formula(paste("gestational_age~dde+",pcb_colnames_no138, "+", confound_colnames, seq = ""))
+```
+
+
+
+
+
+
+
+
+
+

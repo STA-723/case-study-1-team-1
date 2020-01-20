@@ -1,0 +1,178 @@
+---
+output: pdf_document
+---
+# Case Study 1: National Collaborative Perinatal Project
+
+## Background
+The data are taken from the National Collaborative Perinatal Project (CPP). Women were enrolled during pregnancy through different medical centers and then the kids were followed in order to collect both pregnancy and childhood development outcomes. We consider a subsample of 2380 women and children for this analysis, which was studied by [Longnecker et al., 2001].  A particular focus of the Longnecker et al substudy was in assaying serum samples from the original larger study to obtain information on exposures in order to assess the relationship between these exposures to the women and adverse pregnancy and developmental outcomes in their children.  Two exposures of particular interest are Dichlorodiphenyldichloroethylene (DDE) and Polychlorinated Biphenyls (PCBs), which are breakdown products in the body of chemicals that have been historically used to treat crops to protect them from predation.  These chemicals persist in the environment and are lipophilic, building up in fatty deposits in human tissues.  Hence, each of us carries around our own body burden of these chemicals, potentially impacting our health.
+
+## The data
+The dataset contains demographic variables, such as race, age, and socio-economic index, along with smoking status and concentration doses for DDE and PCBs.  In addition, data are available on levels of cholesterol and triglycerides in serum; these variables are relevant since DDE/PCBs are stored in fat and cholesterol/triglycerides provide measurements of the levels of circulating fats (being somewhat informal) in serum. 
+
+## Goal
+The overarching goal of the analysis is to assess how DDE and PCBs relate to risk of premature delivery.  Premature delivery is typically defined as a gestational age at delivery of 37 weeks or less, but it is important to note that deliveries occurring right at the cutoff have similar clinical outcomes to full term deliveries, while deliveries occurring substantially less than 37 weeks (early preterm) are associated with substantial risk of short and long term morbidity and mortality.  Ideally we would like to infer a causal effect of these exposures on risk of premature deliveries of different severities, while investigating the dose response relationship.  However, these data are not collected in a randomized trial but are the result of an observational epidemiology study.  Hence, epidemiologists typically focus on assessing associations, while adjusting for covariates that may confound exposure-outcome relationships.  In addressing the above interests, it is important to take into account heterogeneity across study centers.
+
+## Variable key 
+gestational_age = gestational age (in weeks)
+
+dde = concentration of dde (ug/dL)
+
+pcb_* = concentration of pcb_* (ng/dL)
+
+albumin = concentration of albumin (g/dL)
+
+cholesterol = concentration of cholesterol (g/dL)
+
+triglycerides =  concentration of triglycerides (g/dL)
+
+race 
+
+score_education 
+
+score_income
+
+score_occupation
+
+maternal_age = age of mother
+
+smoking_status = mother smoking
+
+center
+
+```{r Read In Data}
+# Load in data & remove data point with missing PCB information
+dat <- readRDS("Longnecker.rds")
+dat <- dat[-which(is.na(dat$pcb_028)==TRUE),]
+dat$race <- as.factor(dat$race)
+dat$smoking_status <- as.factor(dat$smoking_status)
+dat$center <- as.factor(dat$center)
+dat0 <- dat # store original data
+```
+
+```{r Create Categories}
+library(dplyr)
+# Indicator for preterm
+dat <- dat %>%
+       mutate(preterm_ind = if_else(gestational_age<33,2,
+                                    if_else(gestational_age<37 & 
+                                              gestational_age>32,1,0)))
+dat$preterm_ind <- ordered(dat$preterm_ind)
+```
+
+```{r MICE}
+# Data Imputation (MICE - Predictive Mean Matching)
+library(mice)
+# apply(is.na(dat), 2, sum) 
+# remove albumin; impute score_education, score_income, score_occupation
+dat_mice <- mice(dat[,-13], seed = 12345, printFlag = FALSE)
+imp_dat <- complete(dat_mice)
+```
+
+```{r Sum pcbs}
+pcb_col <- grep("pcb", names(imp_dat))
+orig_pcb <- imp_dat[,pcb_col]
+
+library(corrplot)
+corrplot(cor(orig_pcb))
+
+# Check for multicolinearity
+library(car)
+vif(lm(gestational_age ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_105 + pcb_118 + pcb_153 + pcb_170 + pcb_138 + pcb_180 + pcb_194 + pcb_203, data = imp_dat))
+
+# Combine pcb_118, pcb_153, pcb_138, pcb_105, pcb_180 into one pcb_sum5
+imp_dat <- imp_dat %>%
+            mutate(pcb_sum5 = pcb_118 + pcb_153 + pcb_138
+                   + pcb_105 + pcb_180)
+
+vif(lm(gestational_age ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_170 + pcb_194 + pcb_203 + pcb_sum5, data = imp_dat))
+# all vif's < 4
+ 
+# vif(lm(gestational_age ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_105 + pcb_170 + pcb_180 + pcb_194 + pcb_203 + pcb_sum3, data = imp_dat))
+# # all vif's < 10
+```
+
+```{r Ordinal Logistic Regression}
+library(MASS)
+ord_model <- MASS::polr(preterm_ind ~ dde + pcb_028 + pcb_052 + pcb_074 + pcb_170 + pcb_194 + pcb_203 + pcb_sum5 + triglycerides + race + score_education + score_income + score_occupation + maternal_age + smoking_status + cholesterol + center, data = imp_dat, Hess = TRUE, method = "logistic")
+
+summary(ord_model)
+confint(ord_model)
+```
+
+```{r Model Assessment}
+library(car)
+Anova(ord_model)
+poTest(ord_model)
+```
+
+```{r Effects Plots}
+library(effects)
+par(mfrow=c(1,2))
+plot(Effect("dde", ord_model))
+plot(Effect("pcb_028", ord_model))
+plot(Effect("pcb_052", ord_model))
+plot(Effect("pcb_074", ord_model))
+# plot(Effect("pcb_105", ord_model))
+plot(Effect("pcb_170", ord_model))
+# plot(Effect("pcb_180", ord_model))
+plot(Effect("pcb_194", ord_model))
+plot(Effect("pcb_203", ord_model))
+plot(Effect("pcb_sum5", ord_model))
+# plot(Effect("pcb_sum3", ord_model), style='stacked', key.args=list(x=.55, y=.9))
+```
+
+```{r gam ordinal categorical regression}
+library(mgcv)
+imp_dat$preterm_ind <- as.numeric(imp_dat$preterm_ind)
+gamord_model <- gam(preterm_ind ~ s(dde) + s(pcb_028) + s(pcb_052) + s(pcb_074) + s(pcb_170) + s(pcb_194) + s(pcb_203) + s(pcb_sum5) + s(triglycerides) + race + s(score_education) + s(score_income) + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center, family = ocat(R=3), data = imp_dat)
+
+summary(gamord_model)
+
+library(mgcViz)
+b <- getViz(gamord_model)
+print(plot(b), pages = 1)
+```
+
+
+### Test
+```{r Sum all pcbs}
+# Combine all pcbs
+imp_dat <- imp_dat %>%
+            mutate(pcb_tt = pcb_028 + pcb_052 + pcb_074 + pcb_105 + pcb_118 + pcb_153 + pcb_170 + pcb_138 + pcb_180 + pcb_194 + pcb_203)
+
+library(MASS)
+ord_model_tt <- MASS::polr(preterm_ind ~ dde + pcb_tt + triglycerides + race + score_education + score_income + score_occupation + maternal_age + smoking_status + cholesterol + center, data = imp_dat, Hess = TRUE, method = "logistic")
+
+summary(ord_model_tt)
+confint(ord_model_tt)
+
+library(car)
+Anova(ord_model_tt)
+poTest(ord_model_tt)
+
+library(effects)
+par(mfrow=c(1,2))
+plot(Effect("dde", ord_model_tt))
+plot(Effect("pcb_tt", ord_model_tt))
+
+# Are these 3 models different?
+anova(ord_model_tt, ord_model, pca_model)
+```
+
+```{r Test pcb total in gam}
+library(mgcv)
+imp_dat$preterm_ind <- as.numeric(imp_dat$preterm_ind)
+gamord_model_tt <- gam(preterm_ind ~ s(dde) + s(pcb_tt) + s(triglycerides) + race + s(score_education) + s(score_income) + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center, family = ocat(R=3), data = imp_dat)
+
+summary(gamord_model_tt)
+gam.check(gamord_model_tt)
+
+library(mgcViz)
+b <- getViz(gamord_model_tt)
+print(plot(b), pages = 1)
+```
+
+
+
+
+
