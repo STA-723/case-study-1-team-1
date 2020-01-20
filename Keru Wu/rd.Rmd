@@ -1,0 +1,104 @@
+---
+title: "R1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+dat = readRDS("Longnecker.rds")
+dat$center = factor(dat$center)
+dat$smoking_status = factor(dat$smoking_status)
+
+##which(is.na(dat$pcb_028)) = 1861
+dat = dat[-1861,]
+
+```
+
+
+```{r}
+dat = readRDS("Longnecker.rds")
+dat$center = factor(dat$center)
+dat$smoking_status = factor(dat$smoking_status)
+
+##which(is.na(dat$pcb_028)) = 1861
+
+dat = dat[-1861,]
+
+library(mice)
+
+
+dat = dat[,!names(dat) %in% c('albumin')]
+
+imp = mice(dat)
+
+dat = complete(imp)
+
+
+
+dat$ind_37 = dat$gestational_age < 37
+
+
+
+dat[,c(1:12,13,15,16,17,18,20)] = scale(dat[,c(1:12,13,15,16,17,18,20)])
+```
+
+```{r}
+## PCA
+
+dat[,2:12] = scale(dat[,2:12])
+
+dat$dde = scale(dat$dde)
+
+pca = princomp(dat[,2:12])
+pcb = as.matrix(dat[,2:12])
+pcb_pc = pcb %*% pca$loadings
+
+dat$PC1 = pcb_pc[,1]
+dat$PC2 = pcb_pc[,2]
+dat$PC3 = pcb_pc[,3]
+dat$PC4 = pcb_pc[,4]
+
+## Factor
+library(psych)
+fa.parallel(dat[,2:12], fm = 'minres', fa = 'fa')
+fac = fa(dat[,2:12], 3)
+fa.diagram(fac, cut = 0.25, simple = FALSE)
+score = factor.scores(dat[,2:12], fac)$scores
+
+dat$sc1 = score[,1]
+dat$sc2 = score[,2]
+dat$sc3 = score[,3]
+
+```
+
+```{r}
+
+## GAM Model
+library(gam)
+
+ga1 = gam(ind_37 ~ s(dde) + s(PC1) + s(PC2) + 
+            s(triglycerides) + score_education + score_income + score_occupation + 
+            s(maternal_age) + s(cholesterol) + smoking_status + center + race, family = binomial(link = 'logit'), data = dat)
+
+summary(ga1)
+
+dev.off()
+par(mfrow = c(3,4))
+plot(ga1, se=TRUE)
+```
+
+
+```{r}
+
+library(rstanarm)
+b_ga = stan_gamm4(ind_37 ~ s(dde) + s(PC1) + s(PC2)+
+                    s(triglycerides) + race + score_education + s(score_income) + s(score_occupation) +
+                    s(maternal_age) + smoking_status + s(cholesterol), random = ~(1|center),
+                   family = binomial(link = 'logit'), data = dat,
+                  chain = 1, iter=1000)
+
+
+
+plot_nonlinear(b_ga)
+```
+
+
