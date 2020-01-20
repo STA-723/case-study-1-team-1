@@ -1,0 +1,3 @@
+"0","library(mgcViz)"
+"0","b <- getViz(gam)"
+"0","print(plot(b), pages = 1)"

@@ -1,0 +1,5 @@
+"0","formula(back_temp_2)"
+"1","early_delivery ~ dde + pcb_sum_all + triglycerides + cholesterol + 
+"
+"1","    smoking_status + center + score_occupation
+"

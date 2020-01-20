@@ -357,13 +357,239 @@ df_chem_centered <- df_chem_centered %>%
 
 ```{r}
 model8 <- glm(early_delivery ~ . + dde:triglycerides + dde:cholesterol + pcb_sum_all:triglycerides + pcb_sum_all:cholesterol, 
-              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center),
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center, score_education, score_income, score_occupation, maternal_age),
               family = "binomial")
 summary(model8)
 ```
 
 ```{r}
 car::vif(model8)
+```
+
+
+```{r}
+pairs(df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery), pch = 19)
+```
+
+```{r}
+# imputation
+df_chem_centered <- mice(df_chem_centered, m=1, maxit = 50, method = 'pmm', seed = 42)
+df_chem_centered <- complete(df_chem_centered, 1)
+```
+
+Forgot to factorize center!
+
+```{r}
+df_chem_centered <- df_chem_centered %>% mutate(center = factor(center))
+```
+
+```{r}
+model9 <- glm(early_delivery ~ (.)^2, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center, score_education, score_income, score_occupation, maternal_age),
+              family = "binomial")
+summary(model9)
+```
+
+```{r}
+nothing9 <- glm(early_delivery ~ 1, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center, score_education, score_income, score_occupation, maternal_age),
+              family = "binomial")
+backwards9 <- step(model9)
+```
+
+```{r}
+formula(backwards9)
+```
+
+```{r}
+model10 <- glm(formula(backwards9), 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center, score_education, score_income, score_occupation, maternal_age),
+              family = "binomial")
+summary(model10)
+```
+
+```{r}
+vif(model10)
+```
+
+```{r}
+model11 <- glm(early_delivery ~ dde + pcb_sum_all + triglycerides + cholesterol + 
+    race + score_education + score_income + score_occupation + 
+    maternal_age + smoking_status + center + pcb_sum_all:maternal_age + 
+    triglycerides:race + triglycerides:score_education + triglycerides:maternal_age + 
+    race:score_income + score_income:maternal_age + center:dde + center:pcb_sum_all, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center, score_education, score_income, score_occupation, maternal_age),
+              family = "binomial")
+summary(model11)
+```
+
+Centers are significant, but this could be because the proportion of patients in them.
+
+```{r}
+model_temp <- glm(early_delivery ~ dde + pcb_sum_all + triglycerides + cholesterol + 
+    race + score_education + 
+    maternal_age + smoking_status + center + pcb_sum_all:maternal_age + 
+    triglycerides:race + triglycerides:score_education + triglycerides:maternal_age + 
+    race:score_income + score_income:maternal_age, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center, score_education, score_income, score_occupation, maternal_age),
+              family = "binomial")
+summary(model_temp)
+```
+
+What if I do selection using only main effects?
+
+```{r}
+model_temp_2 <- glm(early_delivery ~ ., 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race, smoking_status, center, score_education, score_income, score_occupation, maternal_age),
+              family = "binomial")
+back_temp_2 <- step(model_temp_2)
+```
+
+```{r}
+formula(back_temp_2)
+```
+
+```{r}
+model_temp_3 <- glm(early_delivery ~ (.)^2, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race, smoking_status, center, score_occupation, maternal_age),
+              family = "binomial")
+back_temp_3 <- step(model_temp_3)
+```
+
+```{r}
+formula(back_temp_3)
+```
+
+```{r}
+df_chem_centered <- df_chem_centered %>%
+  mutate(race = relevel(race, ref = "other"))
+```
+
+```{r}
+model_temp_4 <- glm(early_delivery ~ dde + pcb_sum_all + triglycerides + cholesterol + 
+    race + smoking_status + center + score_occupation + maternal_age + 
+    pcb_sum_all:race + pcb_sum_all:maternal_age + triglycerides:race + 
+    triglycerides:maternal_age + smoking_status:score_occupation, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race, smoking_status, center, score_occupation, maternal_age),
+              family = "binomial")
+summary(model_temp_4)
+```
+
+```{r}
+library(mgcv)
+gam <- mgcv::gam(early_delivery ~ s(dde) + s(pcb_sum_all) + s(triglycerides) + race + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center, family = binomial, method = "REML", data = df_chem_centered)
+
+summary(gam)
+mgcv::gam.check(gam)
+
+library(mgcViz)
+b <- getViz(gam)
+print(plot(b), pages = 1)
+```
+
+```{r}
+pred.probs_gam <-  predict(gam, type="response") # Calculate predicted probabilities
+resid_gam <- residuals(gam) # residuals
+```
+
+```{r}
+# residual plot
+plot(pred.probs_gam, resid_gam, main="Residual plot", 
+   xlab="estimated probabilities", ylab="residual", pch=19)
+abline(a = 0, b = 0)
+```
+
+```{r}
+binnedplot(x = pred.probs_gam ,y = resid_gam, nclass=NULL, 
+            xlab="dde", ylab="Average residual", 
+            main="Binned residual plot: residual vs estimated probabilities for gam", 
+            cex.pts=0.8, col.pts=1, col.int="gray")
+```
+
+```{r}
+plot(gam,residuals=TRUE)
+```
+
+```{r}
+gam_2 <- gam(early_delivery ~ s(dde) + s(pcb_sum_all) + s(triglycerides) + race + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center + s(pcb_sum_all, by = race), family = binomial, data = df_chem_centered)
+
+summary(gam_2)
+gam.check(gam_2)
+
+b_2 <- getViz(gam_2)
+print(plot(b_2), pages = 1)
+```
+
+Try PCA.
+
+```{r PCA}
+# PCA
+pcb_col <- grep("pcb", names(df_chem_centered))
+orig_pcb <- df_chem_centered[,pcb_col]
+pcb.pca <- princomp(orig_pcb)
+summary(pcb.pca) # variation explained
+loadings <- pcb.pca$loadings # loadings
+PCs <- as.matrix(orig_pcb) %*% loadings
+
+df_chem_centered$PC_1 <- PCs[,1]
+df_chem_centered$PC_2 <- PCs[,2]
+df_chem_centered$PC_3 <- PCs[,3]
+df_chem_centered$PC_4 <- PCs[,4]
+df_chem_centered$PC_5 <- PCs[,5]
+```
+
+```{r}
+gam_2 <- mgcv::gam(early_delivery ~ s(dde) + s(PC_1)+ s(PC_2) + s(PC_3) + s(PC_4) + s(PC_5) + s(triglycerides) + race + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center, family = binomial, data = df_chem_centered)
+
+summary(gam_2)
+mgcv::gam.check(gam_2)
+
+b_2 <- getViz(gam_2)
+print(plot(b_2), pages = 1)
+```
+
+```{r}
+gam_3 <- mgcv::gam(early_delivery ~ s(dde) + s(PC_1) + s(triglycerides) + race + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center, family = binomial, data = df_chem_centered)
+
+summary(gam_3)
+mgcv::gam.check(gam_3)
+
+b_3 <- getViz(gam_3)
+print(plot(b_3), pages = 1)
+```
+
+```{r}
+library(gam)
+ga1 = gam(early_delivery ~ s(dde) + s(PC_1) + s(PC_2) + s(PC_3) + s(PC_4) + 
+            s(triglycerides) + race + score_education + score_income + score_occupation + 
+            s(maternal_age) + smoking_status + s(cholesterol) + center, family = binomial(), data = df_chem_centered)
+
+par(mfrow = c(3,4))
+plot(ga1, se=TRUE)
+
+summary(ga1)
+
+hist(residuals(ga1))
+```
+
+```{r}
+library(gam)
+ga2 = gam(early_delivery ~ s(dde) + s(pcb_sum_all) + s(triglycerides) + race + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center, family = binomial(), data = df_chem_centered)
+
+par(mfrow = c(3,4))
+plot(ga2, se=TRUE)
+
+summary(ga2)
+```
+
+```{r}
+library(gam)
+ga3 = gam(early_delivery ~ s(dde) + s(PC_2) + s(triglycerides) + race + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center, family = binomial(), data = df_chem_centered)
+
+par(mfrow = c(3,4))
+plot(ga3, se=TRUE)
+
+summary(ga3)
 ```
 
 # TO DO
@@ -385,7 +611,11 @@ Interpretation of residual plot
 
 Scale
 
-Variable selection?
+Variable selection? First select for main effects and then consider interactions?
+
+* check mean squre ratio
+
+Assessing leverage / influential points?
 
 
 # Questions
@@ -400,5 +630,15 @@ What unit is a significant unit?
 
 Dealing with LOD - 
 
+Significance level change when reference level of dummy variable change
+
+"
+nothing9 <- glm(early_delivery ~ 1, 
+              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center, score_education, score_income, score_occupation, maternal_age),
+              family = "binomial")
+backwards9 <- step(model9)
+" Gives complete separation - "glm.fit: fitted probabilities numerically 0 or 1 occurred"
+
+Do i include interactions if main effects are already not significant
 
 

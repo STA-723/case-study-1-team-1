@@ -1,5 +1,5 @@
 "0","model8 <- glm(early_delivery ~ . + dde:triglycerides + dde:cholesterol + pcb_sum_all:triglycerides + pcb_sum_all:cholesterol, "
-"0","              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center),"
+"0","              data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, triglycerides, cholesterol, early_delivery, race:smoking_status, center, score_education, score_income, score_occupation, maternal_age),"
 "0","              family = ""binomial"")"
 "0","summary(model8)"
 "1","
@@ -9,7 +9,8 @@ Call:
     pcb_sum_all:triglycerides + pcb_sum_all:cholesterol, family = ""binomial"", 
     data = df_chem_centered %>% dplyr::select(dde, pcb_sum_all, 
         triglycerides, cholesterol, early_delivery, race:smoking_status, 
-        center))"
+        center, score_education, score_income, score_occupation, 
+        maternal_age))"
 "1","
 
 "

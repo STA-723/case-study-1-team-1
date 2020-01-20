@@ -1,0 +1,4 @@
+"0","library(gam)"
+"0","ga3 = gam(early_delivery ~ s(dde) + s(PC_2) + s(triglycerides) + race + s(score_occupation) + s(maternal_age) + smoking_status + s(cholesterol) + center, family = binomial(), data = df_chem_centered)"
+"0","par(mfrow = c(3,4))"
+"0","plot(ga3, se=TRUE)"

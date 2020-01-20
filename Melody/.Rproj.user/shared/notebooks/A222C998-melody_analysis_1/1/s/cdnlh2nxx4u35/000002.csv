@@ -1,0 +1,9 @@
+"0","formula(back_temp_3)"
+"1","early_delivery ~ dde + pcb_sum_all + triglycerides + cholesterol + 
+"
+"1","    race + smoking_status + center + score_occupation + maternal_age + 
+"
+"1","    pcb_sum_all:race + pcb_sum_all:maternal_age + triglycerides:race + 
+"
+"1","    triglycerides:maternal_age + smoking_status:score_occupation
+"

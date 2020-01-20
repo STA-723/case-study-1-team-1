@@ -1,0 +1,2 @@
+"0","pred.probs_gam <-  predict(gam, type=""response"") # Calculate predicted probabilities"
+"0","resid_gam <- residuals(gam) # residuals"

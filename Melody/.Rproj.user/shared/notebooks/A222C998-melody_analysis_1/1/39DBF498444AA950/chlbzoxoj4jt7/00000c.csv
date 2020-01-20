@@ -1,0 +1,4 @@
+"0","binnedplot(x = pred.probs_gam ,y = resid_gam, nclass=NULL, "
+"0","            xlab=""dde"", ylab=""Average residual"", "
+"0","            main=""Binned residual plot: residual vs estimated probabilities for gam"", "
+"0","            cex.pts=0.8, col.pts=1, col.int=""gray"")"

@@ -1,0 +1,2 @@
+"0","b_2 <- getViz(gam_2)"
+"0","print(plot(b_2), pages = 1)"
