@@ -21,9 +21,9 @@
 \frametitle{Introduction}
 
 \begin{itemize}
-\item Data: Subset of National Collaborative Perinatal Project (CPP), comprised of 2380 observations of pregnant women [Longnecker et al., 2001].
+\item Data: A study by Longnecker et al. (2001), comprised of 2380 observations of pregnant women.
   
-\item Goal: Assess how DDE and PCBs associate with risk of premature delivery, adjusting for confounding variables.
+\item Goal: Assess how DDE and PCBs relate to risk of premature delivery.
 
 \end{itemize}
 
@@ -54,7 +54,7 @@
 
     \begin{itemize}
         \item There are 11 types of PCBs, some of which have high correlation and might distort modeling result.
-        \item  \includegraphics[scale=0.4]{corrplot.png}
+          \includegraphics[scale=0.4]{corrplot.png}
         \item Possible approaches: Simple sum, PCA, Factor Analysis.
     \end{itemize}
 
@@ -65,7 +65,7 @@
 
     \begin{itemize}
         \item Possible approaches: Simple sum, PCA, Factor Analysis.
-        \item \includegraphics[scale=0.4]{PCA.png}
+         \includegraphics[scale=0.4]{PCA.png}
 
 
     \end{itemize}
@@ -84,52 +84,65 @@
 
 
 
+
 \begin{frame}
 \frametitle{Model}
 
 
 \begin{itemize}
-\item Linear regression or logistic regression?
+\item Binary response: use logistic regression?
 \pause
-\item Too simple $\&$ Can't fit nonlinear trend.
+\item Domain knowledge about chemical effects?
 \pause
-\item Domain knowledge?
+\item No effect when concentration is below some lower bound.
 \pause
-\item Chemicals have no effect when concentration is lower than a bound.
+\item Constant effect after reaching some upper bound.
 \pause
-\item Chemicals have constant effect when concentration is higher than a bound.
-\pause
-\item Nonlinear Model
+\item Generalized Additive Model (GAM)
 \end{itemize}
 \end{frame}
 
 
-
-
-
-
-
-
-
-
-
 \begin{frame}
 \frametitle{Model}
-
 
 \begin{itemize}
 \item Generalized Additive Model (GAM)
 $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_i(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 
 \item Choice of $g$: probit or logit.
-\item $x_{.j}$s include DDE, PCBs, maternal age, etc.
-\item $z_{.k}$s include categorical variables and some confounding variables.
+\item $x_{.j}$s include numeric variables: DDE, Principal Components of PCBs (PC1-4), Maternal Age, etc.
+\item $z_{.k}$s include categorical variables.
 
 \end{itemize}
 \end{frame}
 
 
 
+\begin{frame}
+\frametitle{GAM Outputs}
+\centering
+\includegraphics[width=10cm]{GAMOutputs1.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{GAM Outputs}
+\centering
+\includegraphics[width=10cm]{GAMOutputs2.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{GAM Outputs}
+   \begin{minipage}{1\textwidth}
+    \includegraphics[width=55mm]{GAMPlotdde.png}
+    \hfill
+    \includegraphics[width=55mm]{GAMPlotPC1.png}
+    \vspace{0.5cm}
+    \includegraphics[width=55mm]{GAMPlotMaternalAge.png}
+    \hfill
+    \includegraphics[width=55mm]{GAMPlotCenter.png}
+  \end{minipage}
+\end{frame}
 
 \begin{frame}
 \frametitle{Model}
@@ -148,18 +161,42 @@ $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_j(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Model Results - align with frequentist model}
+\includegraphics[width = 10cm]{BGAM.jpeg}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Model Check}
+\includegraphics[width = 10cm]{BGAM2.jpeg}
+
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 \begin{frame}
 \frametitle{Discussion}
 
+
+
 \begin{itemize}
 
 \item Deal with different centers
 \pause
 \item Approach 1: Bayesian Hierarchical Model
-\pause
 \item Approach 2: Mixed Effect / Random Effect Model
 \pause
 \item Generalized Additive Mixed Model (GAMM)
@@ -175,26 +212,15 @@ $$g(Y_i) = \beta_0 + \sum_{j=1}^m f_j(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
 
 \begin{itemize}
 
-
 \item Specialized prior may give narrower credible intervals.
 \pause
 \item Including Interactions: Bayesian Factor Analysis (Ferrari, F. and Dunson, D.B. 2019)
-
+\pause
+\item Model with variable selection (e.g. LASSO, GAM + penalty)
 
 
 \end{itemize}
 \end{frame}
-
-
-
-
-
-
-
-
-
-
-
 
 
 
