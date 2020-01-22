@@ -15,7 +15,7 @@ This report was commissioned to analyze the data from the National Collaborative
 
 ## 1. Introduction
 
-The dataset taken from CPP includes 2380 samples of women and their childrenwhich was studied by Longnecker et al. (2001). A particular focus of this study was to determine the association between chemical exposures to woen and adverse pregnancy and developmental outcomes in their children. DDE and PCBs are of primary interest among all exposures, both of which are breakdown products in the body of chemicals. These chemicals build up fatty deposits and exist universally in our body, therefore impacting our health. The dataset also contains other variables such as age, race, smoking status, etc. Levels of cholesterol and triglycerides are available as well. The goal of our analysis is to assess how DDE and PCBs relate the risk of preterm birth, which is defined as deliveries occurring lower than 37 weeks.
+The dataset taken from CPP includes 2380 samples of women and their children which was studied by Longnecker et al. (2001). A particular focus of this study was to determine the association between chemical exposures to women and adverse pregnancy and developmental outcomes in their children. It is of interest to study how chemical exposures relate to preganancy since abnormalities in pregnancy such as early delivery might cause unfavorable developmental outcomes in children. DDE and PCBs are of primary interest among all exposures, both of which are breakdown products in the body of chemicals. These chemicals build up fatty deposits and exist universally in our body, therefore impacting our health. The dataset also contains other variables such as age, race, smoking status, etc. Levels of cholesterol and triglycerides are available as well. The goal of our analysis is to assess how DDE and PCBs relate the risk of preterm birth, which is defined as deliveries occurring lower than 37 weeks.
 
 Our findings demonstrate that there are positive association between two interested exposures and the risk of preterm birth. Higher concentrations of DDE and PCBs are related to higher risk of premature delivery. Although various PCBs show diffrent significance in the relationship, generally they all contribute to higher risk. Some noticable PCBs are pcb_074, pcb_105, pcb_118, pcb_153 and pcb_170. Another finding of our analysis is that when concentration of these exposures is below a lower bound, both exposures have almost no effect, while they have a constant effect when they are beyond a higher bound. This result indicate flat regions in the association and could be studied in the future.
 
@@ -35,6 +35,8 @@ However, frequentist approach may overestimate uncertainty and produce a non-sig
 ## 3. Results
 
 ### 3.1 Exploratary Data Analysis
+
+We examined the correlation among explanatory variables and found high correlation between PCBs, as shown in Figure . Such high correlation might distort modeling result, so we made PCBs into Principal Components (PCs) as introduced in Section 2. After data pre-processing, we examined the distribution of DDE and first principle component of PCB, and found that for both DDE and PCB, the concentration of chemical is generally higher in observations that has preterm delivery, as shown in Figure.
 
 ### 3.2 Main Results
 
