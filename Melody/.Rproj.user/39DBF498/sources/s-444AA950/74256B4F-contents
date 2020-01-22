@@ -86,6 +86,15 @@ ggplot(dat, aes(x = race, y = as.matrix(dat %>% dplyr::select(pcb_028:pcb_203)) 
   labs(fill = "race", x = "race", y = "weighted sum of pcb by first column of loadings matrix")
 ```
 
-
+```{r}
+# maternal age and early delivery
+dat_temp <- as.data.frame(table(dat$maternal_age, dat$ind_37))
+ggplot(dat_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
+    geom_bar(position = "fill",stat = "identity") +
+    # or:
+    # geom_bar(position = position_fill(), stat = "identity") 
+    scale_y_continuous(labels = scales::percent_format()) + 
+  labs(fill = "preterm delivery", x = "scaled age of mother", y = "proportion of early delivery")
+```
 
 

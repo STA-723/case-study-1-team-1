@@ -36,11 +36,11 @@ However, frequentist approach may overestimate uncertainty and produce a non-sig
 
 ### 3.1 Exploratary Data Analysis
 
-We examined the correlation among explanatory variables and found high correlation between PCBs, as shown in Figure . Such high correlation might distort modeling result, so we made PCBs into Principal Components (PCs) as introduced in Section 2. After data pre-processing, we examined the distribution of DDE and first principle component of PCB, and found that for both DDE and PCB, the concentration of chemical is generally higher in observations that has preterm delivery, as shown in Figure.
+We examined the correlation among explanatory variables and found high correlation between PCBs, as shown in Figure 1A. Such high correlation might distort modeling result, so we made PCBs into Principal Components (PCs) as introduced in Section 2. After data pre-processing, we examined the distribution of DDE and first principle component of PCB, and found that for both DDE and PCB, the concentration of chemical is generally higher in observations that has preterm delivery, as shown in Figure 1B and Figure 1C. Among the possible covariates, most notably, there is a nonlinear relationship between age of mother and proportion of early delivery, as shown in Figure 1D.
 
 ### 3.2 Main Results
 
-Using frequentist GAM, we found that there are slightly positive association between chemical exposures and preterm delivery. Among all covariates, DDE, PC1, As shown in Figure 1 in the appendix, as DDE level increases, the log-odds of preterm delivery increases. And in Figure 2, increasing PC1 is associated with increasing log-odds of preterm delivery. The change in probability of preterm delivery at different levels of DDE and PC1 are summarized in Tables 1 & 2 in the Appendix.
+Using frequentist GAM, we found that there are slightly positive association between chemical exposures and preterm delivery. Among all covariates, DDE, PC1, As shown in Figure 2 in the appendix, as DDE level increases, the log-odds of preterm delivery increases. And in Figure 3, increasing PC1 is associated with increasing log-odds of preterm delivery. The change in probability of preterm delivery at different levels of DDE and PC1 are summarized in Tables 1 & 2 in the Appendix.
 
 As shown in the tables, higher DDE level is associated with higher probability of preterm delivery. But the rate of increment decreases as DDE level increases, which aligns with our presumption of dose-response effect (the effect may be less significant as chemical level increases). As for PC1, there is also positive association between PC1 and the probability of preterm delivery. As PC1 has positive relationship with PCBs, the PCBs also have positive association with preterm delivery. Hence, we conclude that the chemicals (DDE and PCBs) have positive association with preterm delivery.
 
@@ -83,6 +83,24 @@ Furthermore, interaction between chemicals also impacts human health outcomes. C
 ```{r message=FALSE, echo=FALSE}
 library(cowplot)
 library(ggplot2)
+library(magick)
+
+p1 <- ggdraw() + draw_image("corrplot.png", scale = 0.9)+
+  ggtitle("Figure 1")
+p2 <- ggdraw() + draw_image("ddeVSearly.png", scale = 0.9)+
+  ggtitle("Figure 2")
+p3 <- ggdraw() + draw_image("pcbVSearly.png", scale = 0.9)+
+  ggtitle("Figure 3")
+p4 <- ggdraw() + draw_image("earlyVSAge.png", scale = 0.9)+
+  ggtitle("Figure 4")
+
+pp1 <- plot_grid(p1, p2, p3, p4, labels = "AUTO")
+ggdraw(add_sub(pp1, "Figure 1. Plots for exploratory data analysis", vpadding=grid::unit(0, "lines"), y = 2, x = 0.32, hjust = 0, size=8, fontface="bold"))
+```
+
+```{r message=FALSE, echo=FALSE}
+library(cowplot)
+library(ggplot2)
 
 p1 <- ggdraw() + draw_image("GAMPlotdde.png", scale = 0.9)+
   ggtitle("Figure 1")
@@ -90,7 +108,7 @@ p2 <- ggdraw() + draw_image("GAMPlotPC1.png", scale = 0.9)+
   ggtitle("Figure 2")
 
 pp1<- plot_grid(p1, p2)
-ggdraw(add_sub(pp1, "Figure 1 & 2. Marginal Effect Plot for DDE and PC1", vpadding=grid::unit(0, "lines"), y = 10, x = 0.32, hjust = 0, size=8, fontface="bold"))
+ggdraw(add_sub(pp1, "Figure 2 & 3. Marginal Effect Plot for DDE and PC1", vpadding=grid::unit(0, "lines"), y = 10, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
 
 \begin{table}[ht]
