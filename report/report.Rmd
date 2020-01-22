@@ -21,13 +21,11 @@ Our findings demonstrate that there is positive association between two interest
 
 ## 2. Materials $\&$ Methods
 
-After grouping Gestational Age into binary response variable (Preterm Delivery or Non-preterm Delivery), we first applied frequentist approach to fit the data. Since it is common to have non-linear dose-effect relationship, we used Generalized Additive Model (GAM). The regression function is given by:
-$$
-g(E(Y)) = \beta_0 + \sum{f(X_j)} + \sum{\beta_k \cdot Z_k}
-$$
+After grouping Gestational Age into binary response variable (Preterm Delivery or Non-preterm Delivery), in order to allow for non-linear dose-response relationship, we applied Generalized Additive Model (GAM) to fit the data.
+
 Logit transformation is applied to the binary response variable. Numeric covariates, including DDE, Pricipal Components (PCs) 1 to 4 of PCBs, Maternal Age, triglycerides level and cholesterol level are smoothed to allow for non-linear association. Furthermore, we also adjusted for categorical confounding variables by including them in the model as linear covariates, which includes Smoking Status, Race, Center, etc. 
 
-We conducted model checking on the fitted GAM model and checked the effect plots of DDE and PCs. In order to quantify the association for DDE and PCBs (via pricipal components), we controled for all other covariates and computed the change in probability of preterm delivery at different levels of DDE and PCBs.
+We conducted model checking on the fitted GAM model and examined the effect plots of DDE and PCs. In order to quantify the association for DDE and PCBs (via PCs), we controled for all other covariates and computed the change in probability of Preterm Delivery at different levels of DDE and PCs.
 
 However, frequentist approach may overestimate uncertainty and produce a non-significant p-value. In addition, residual plot of previous GAM model indicates that assumptions of frequentist GAM could be unwarranted. To improve performance of our model, we instead use a Bayesian Generalized Additive Model. We add priors on the common regression coefficients and priors on the standard deviations of the smooth terms. We use default settings in $stan_gamm4$ function in R package $rstanarm$, which adopts a weak informative normal prior for all common regression coefficients and standard deviations of the smooth terms.
 
