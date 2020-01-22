@@ -1,0 +1,101 @@
+---
+title: "Appendix for STA723 Case Study - Group 1"
+author: "Melody Jiang, Irene Ji, Keru Wu"
+date: "1/22/2020"
+output:
+  pdf_document
+toc: true
+number_sections: true
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This appendix mainly contains codes and additional outputs.
+
+
+# 1 EDA
+
+## 1.1 
+
+```{r}
+dat = readRDS("Longnecker.rds")
+dat$center = factor(dat$center)
+dat$smoking_status = factor(dat$smoking_status)
+
+dat = dat[-1861,]
+library(mice)
+dat = dat[,!names(dat) %in% c('albumin')]
+imp = mice(dat)
+dat = complete(imp)
+
+dat$ind_37 = dat$gestational_age < 37
+dat[,c(1:12,13,15,16,17,18,20)] = scale(dat[,c(1:12,13,15,16,17,18,20)])
+
+```
+
+# 2 PCA
+
+## 2.1 PCA results
+
+```{r}
+## PCA
+
+pca = princomp(dat[,2:12])
+pcb = as.matrix(dat[,2:12])
+pcb_pc = pcb %*% pca$loadings
+print(pca$loadings)
+summary(pca)
+
+dat$PC1 = pcb_pc[,1]
+dat$PC2 = pcb_pc[,2]
+dat$PC3 = pcb_pc[,3]
+dat$PC4 = pcb_pc[,4]
+
+
+```
+
+# 3 GAM model
+
+# 4 Bayesian GAM
+
+Bayesian Generalized Additive Model
+$$g(Y_i) = \beta_0 + \sum_{j=1}^m f_j(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
+
+We add priors on the common regression coefficients, priors on the standard deviations of the smooth terms. The priors are set by default in $rstanarm$ package, which is a weak informative normal prior. 
+
+
+## 4.1 Model results
+
+```{r}
+
+library(rstanarm)
+
+b_ga = stan_gamm4(ind_37 ~ s(dde) + s(PC1) + s(PC2)+
+                    s(triglycerides) + race + score_education + score_income + score_occupation +
+                    s(maternal_age) + smoking_status + s(cholesterol) + center,
+                   family = binomial(link = 'logit'), data = dat,
+                  chain = 1, iter=1000)
+
+plot_nonlinear(b_ga)
+
+```
+
+
+## 4.2 Model check
+
+```{r}
+
+library(arm)
+
+pred.probs_gam <-  predict(b_ga, dat, type = 'response') # Calculate predicted probabilities
+resid_gam <- residuals(b_ga) # residuals
+
+binnedplot(x = pred.probs_gam ,y = resid_gam, nclass=NULL, 
+            xlab="Predicted value", ylab="Average residual", 
+            main="Binned residual plot: residual vs estimated probabilities for gam", 
+            cex.pts=0.8, col.pts=1, col.int="gray")
+
+```
