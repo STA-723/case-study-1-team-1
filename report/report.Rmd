@@ -11,7 +11,7 @@ geometry: margin=1.2in
 
 ### Abstract
 
-This report was commissioned to analyze the data from the National Collaborative Perinatal Project(CPP). The report evaluates association between exposures Dichlorodiphenyldichloroethylene (DDE) $\&$ Polychlorinated Biphenyls (PCBs) and the risk of preterm birth. After EDA and data preprocessing, we carry out principle component analysis (PCA) for dimensionality reduction, and adopt the Generalized Additive Model (GAM) as well as its Bayesian counterpart for analysis. Our approach successfully captures the nonlinearity between interested variables and risk of premature delivery, and it also aligns with known conclusions in epidemiology. Our results demonstrate that exposure to higher concentrations of DDE and PCBs are associated higher risk of preterm birth.
+This report evaluates association between exposures Dichlorodiphenyldichloroethylene (DDE) $\&$ Polychlorinated Biphenyls (PCBs) and the risk of preterm birth, using a subset of data from the National Collaborative Perinatal Project(CPP). We adopted the Generalized Additive Model (GAM) as well as its Bayesian counterpart for analysis. Our approach successfully captured the nonlinearity between interested variables and risk of premature delivery, and it also aligns with known conclusions in epidemiology. Our results demonstrate that exposure to higher concentrations of DDE and PCBs are associated higher risk of preterm birth.
 
 ## 1. Introduction
 
