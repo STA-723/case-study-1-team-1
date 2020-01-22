@@ -44,7 +44,7 @@ Using frequentist GAM, we found that there are slightly positive association bet
 
 As shown in the tables, higher DDE level is associated with higher probability of preterm delivery. But the rate of increment decreases as DDE level increases, which aligns with our presumption of dose-response effect (the effect may be less significant as chemical level increases). As for PC1, there is also positive association between PC1 and the probability of preterm delivery. As PC1 has positive relationship with PCBs, the PCBs also have positive association with preterm delivery. Hence, we conclude that the chemicals (DDE and PCBs) have positive association with preterm delivery.
 
-Results from our Bayesian Generalized Additive Model align with previous results in frequentist approach. In Figure 1, higher concentration of DDE and PCBs is related to higher risks for pregnant women. In addition, both DDE and the first principle component have significant p-values, indicating the importance of these exposures in the relationship with the response. If we further consier use estimates of Bayesian GAM to check residual assumptions of GAM, Figure 2 verifies the correctness of Bayesian GAM, which outperforms that of frequentist approach. Estimated effects of DDE and PCBs also have narrower credible intervals compared to frequentist ones. Our model capture some flat regions when concentration is relatively low and high. 
+Results from our Bayesian Generalized Additive Model align with previous results in frequentist approach. In Figure 4, higher concentration of DDE and PCBs is related to higher risks for pregnant women. In addition, both DDE and the first principle component have significant p-values, indicating the importance of these exposures in the relationship with the response. If we further consier use estimates of Bayesian GAM to check residual assumptions of GAM, Figure 5 verifies the correctness of Bayesian GAM, which outperforms that of frequentist approach. Estimated effects of DDE and PCBs also have narrower credible intervals compared to frequentist ones. Our model capture some flat regions when concentration is relatively low and high. 
 
 Increase of 1 unit in DDE leads to approxiamately an increase of 0.017 in log odds when DDE has the lowest concentration 2.5 ug/dL. And it decrease to 0.015 when DDE reaches the average concentration 30 ug/dL. But when DDE reaches 120 ug/dL, its increase does not impact the log odds of risk (almost constant risk). This flat region result aligns with domain knowledge of epidemiology that chemical effects become stable after reaching a upper bound. We conclude similar results when analyzing the first principle component of PCBs: when PC1 is lower than 0 or higher than 15, Bayesian GAM shows that change in PC1 has almost no effect. But when PC1 is around its mean value 7.5, one unit increase in PC1 results in an increase of 0.1 in log odds. Note that all loadings for the first PC are positive, where pcb_74, pcb_105, pcb_138, etc. have loadings over 0.3. Therefore after transforming back to original scale, flat region still exist for PCBs, and unit increase in one specific PCB can be attained. (e.g. one unit increase in pcb_138 leads to an increase of 0.66 in log odds when pcb_138 is at mean level 0.67 ng/dL)
 
@@ -53,7 +53,7 @@ Increase of 1 unit in DDE leads to approxiamately an increase of 0.017 in log od
 
 ### 3.3 Sensitivity Analysis
 
-Frequentist GAM and Bayesian GAM give confidence intervals and credible intervals for measuring the effects respectively. Generally speaking, Bayesian GAM has narrower intervals and more significant p-values in anova tests. Both models show one common result that when concentrations of DDE $\&$ PCBs become higher, uncertainty increase greatly. This is partially due to the fact that we have limited data for higher level concentrations.
+Frequentist GAM and Bayesian GAM give confidence intervals and credible intervals for measuring the effects respectively. Generally speaking, Bayesian GAM has narrower intervals and more significant p-values in anova tests. Both models show one common result that when concentrations of DDE $\&$ PCBs become higher, uncertainty increase greatly. This is partially due to the fact that we have limited data for higher level concentrations. Refer to attached figures for detailed CI intervals.
 
 In addition, how to deal with the collinearity of PCBs and carry out dimensionality reduction has great influence in our approach. Our adopted PCA approach has the best performance compared to simple sum and factor analysis, which either have low sigfinicance for PCBs, or become unwarranted after model check. 
 
@@ -61,18 +61,23 @@ In addition, how to deal with the collinearity of PCBs and carry out dimensional
 
 ## 4. Discussion
 
-This report has analyzed how DDE and PCBs relate to the risk of premature delivery. After data preprocessing, feature selection, and preliminary model building, adopted the Generalized Additive Model (GAM) and its Bayesian version. Our approach has advantages that it captures the nonlinearity relationship between exposures and outcomes, and it also accounts for confounding variables. We conclude that higher exposure to DDE and certain PCBs may be associated with higher risk of premature delivery. 
+This report has analyzed how DDE and PCBs relate to the risk of premature delivery. After preprocessing data (e.g. impute missing data) and dimensionality reduction (PCA), we build up different models for the data and finally adopt the Generalized Additive Model (GAM) and its Bayesian version. Our approach has advantages that it captures the nonlinearity relationship between exposures and outcomes, and it also fits confounding variables. We conclude that higher exposure to DDE and certain PCBs may be associated with higher risk of premature delivery. 
 
-The first possible improvement to our approach is to deal with different centers specifically. Our model demonstrates that center 15 and center 37 may deviate from others, which contains samples with higher risks. One may adopt a Bayesian hierarchical model which specifies different variances between centers. Another more direct extension of our GAM model is to include mixed effect. We may use Generalized Additive Mixed Model (GAMM) to consider random effect of centers and it can also be applied to other categorical variables like smoking status and race.
+The first extension of our approach is to deal with different centers specially. Our model demonstrates that center 15 and center 37 may deviate from others, which genrally collect samples with higher risks. There are other ways which may perform better in dealing with centers. One can adopt a Bayesian hierarchical model which specifies different variances between centers. Another more direct extension of our GAM model is to include mixed effect. We may use Generalized Additive Mixed Model (GAMM) to consider random effect of centers and it can also be applied to other categorical variables like smoking status and race.
 
-After discovering that DDE and PCBs are related to higher risk of preterm birth, we could examine the trend of exposures effects more accurately. Specifying a special prior (e.g. guarantee monotonicity) may benefit from narrower credible intervals compared to frequentist approach and naive bayes approach. 
+After we find out that DDE and PCBs are related to higher risk of preterm birth, we can examine the trend of exposures effects more accurately. Specifying a special prior (e.g. guarantee monotonicity) may benefit from narrower credible intervals compared to frequentist approach and naive bayes approach. 
 
-Furthermore, interaction between chemicals also might impact human health outcomes. Collinearity among PCBs indicates the need for a general dimension reduction method or a variable selection approach. Ferrari and Dunson (2019) build up a bayesian factor model designed for interactions. High correlation between exposure levels can be explained in this flexible dimension reduction approach. Another future research direction is to include penalty in GAM for variable selection.
-
+Furthermore, interaction between chemicals also impacts human health outcomes. Collinearity among PCBs indicates the need for a general dimension reduction method or a variable selection approach. Ferrari and Dunson (2019) build up a bayesian factor model designed for interactions. High correlation between exposure levels can be explained in this flexible dimension reduction approach. Another future research direction is to include penalty in GAM for variable selection.
 
 \newpage
 
 ## References
+
+Ferrari, Federico, and David B. Dunson. "Bayesian Factor Analysis for Inference on Interactions." arXiv preprint arXiv:1904.11603 (2019).
+
+Gabry, Jonah, and Ben Goodrich. "rstanarm: Bayesian applied regression modeling via Stan." R package version 2.1 (2016).
+
+Hastie, Trevor J. "Generalized additive models." Statistical models in S. Routledge, 249-307. (2017).
 
 
 
@@ -80,11 +85,10 @@ Furthermore, interaction between chemicals also might impact human health outcom
 
 ## Figures and Tables 
 
-```{r message=FALSE, echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 library(cowplot)
 library(ggplot2)
 library(magick)
-
 p1 <- ggdraw() + draw_image("corrplot.png", scale = 0.9)+
   ggtitle("Figure 1")
 p2 <- ggdraw() + draw_image("ddeVSearly.png", scale = 0.9)+
@@ -93,7 +97,6 @@ p3 <- ggdraw() + draw_image("pcbVSearly.png", scale = 0.9)+
   ggtitle("Figure 3")
 p4 <- ggdraw() + draw_image("earlyVSAge.png", scale = 0.9)+
   ggtitle("Figure 4")
-
 pp1 <- plot_grid(p1, p2, p3, p4, labels = "AUTO")
 ggdraw(add_sub(pp1, "Figure 1. Plots for exploratory data analysis", vpadding=grid::unit(0, "lines"), y = 2, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
@@ -101,12 +104,10 @@ ggdraw(add_sub(pp1, "Figure 1. Plots for exploratory data analysis", vpadding=gr
 ```{r message=FALSE, echo=FALSE}
 library(cowplot)
 library(ggplot2)
-
 p1 <- ggdraw() + draw_image("GAMPlotdde.png", scale = 0.9)+
   ggtitle("Figure 1")
 p2 <- ggdraw() + draw_image("GAMPlotPC1.png", scale = 0.9)+
   ggtitle("Figure 2")
-
 pp1<- plot_grid(p1, p2)
 ggdraw(add_sub(pp1, "Figure 2 & 3. Marginal Effect Plot for DDE and PC1", vpadding=grid::unit(0, "lines"), y = 10, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
@@ -140,11 +141,15 @@ ggdraw(add_sub(pp1, "Figure 2 & 3. Marginal Effect Plot for DDE and PC1", vpaddi
 \caption{Change in Probability of Preterm Delivery at Different PC1 Levels}
 \end{table}
 
-```{r, echo=FALSE, fig.cap="Bayesian Generalized Additive Model", out.width = '100%',fig.align = "center"}
-knitr::include_graphics("BGAM.jpeg")
+```{r, echo=FALSE, out.width = '80%',fig.align = "center"}
+p1 <- ggdraw() + draw_image("BGAM.jpeg", scale = 0.9)+
+  ggtitle("Figure 4")
+ggdraw(add_sub(p1, "Figure 4. Nonlinear trend of several variables in Bayesian GAM", vpadding=grid::unit(0, "lines"), y = 3, x = 0.3, hjust = 0, size=8, fontface="bold"))
+#knitr::include_graphics("BGAM.jpeg")
 ```
 
-```{r, echo=FALSE, fig.cap="Bayesian GAM model check", out.width = '100%',fig.align = "center"}
-knitr::include_graphics("BGAM2.jpeg")
+```{r, echo=FALSE, out.width = '80%',fig.align = "center"}
+p1 <- ggdraw() + draw_image("BGAM2.jpeg", scale = 0.9)+
+  ggtitle("Figure 4")
+ggdraw(add_sub(p1, "Figure 5. Bayesian GAM model check", vpadding=grid::unit(0, "lines"), y = 3, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
-
