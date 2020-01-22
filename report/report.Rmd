@@ -40,7 +40,7 @@ After data pre-processing, we examined the distribution of DDE and first princip
 
 ### 3.2 Main Results
 
-Using frequentist GAM, we found that there are slightly positive association between chemical exposures and preterm delivery. Among all covariates, DDE, PC1, As shown in Figure 2 in the appendix, as DDE level increases, the log-odds of preterm delivery increases. And in Figure 3, increasing PC1 is associated with increasing log-odds of preterm delivery. The change in probability of preterm delivery at different levels of DDE and PC1 are summarized in Tables 1 & 2 in the Appendix.
+Using frequentist GAM, we found that there are slightly positive association between chemical exposures and preterm delivery. Among all covariates, DDE, PC1, As shown in Figure 2 in the appendix, as DDE level increases, the log-odds of preterm delivery increases. Increasing PC1 is also associated with increasing log-odds of preterm delivery. The change in probability of preterm delivery at different levels of DDE and PC1 are summarized in Tables 1 & 2 in the Appendix.
 
 As shown in the tables, higher DDE level is associated with higher probability of preterm delivery. But the rate of increment decreases as DDE level increases, which aligns with our presumption of dose-response effect (the effect may be less significant as chemical level increases). As for PC1, there is also positive association between PC1 and the probability of preterm delivery. As PC1 has positive relationship with PCBs, the PCBs also have positive association with preterm delivery. Hence, we conclude that the chemicals (DDE and PCBs) have positive association with preterm delivery.
 
@@ -83,7 +83,7 @@ Hastie, Trevor J. "Generalized additive models." Statistical models in S. Routle
 
 \newpage
 
-## Figures and Tables 
+## Appendix A. Figures and Tables 
 
 ```{r message=FALSE, echo=FALSE, warning=FALSE}
 library(cowplot)
@@ -105,11 +105,26 @@ ggdraw(add_sub(pp1, "Figure 1. Plots for exploratory data analysis", vpadding=gr
 library(cowplot)
 library(ggplot2)
 p1 <- ggdraw() + draw_image("GAMPlotdde.png", scale = 0.9)+
-  ggtitle("Figure 1")
-p2 <- ggdraw() + draw_image("GAMPlotPC1.png", scale = 0.9)+
   ggtitle("Figure 2")
+p2 <- ggdraw() + draw_image("GAMPlotPC1.png", scale = 0.9)+
+  ggtitle("Figure 3")
+p3 <- ggdraw() + draw_image("GAMPlotMaternalAge.png", scale = 0.9)+
+  ggtitle("Figure 4")
+p4 <- ggdraw() + draw_image("GAMPlotCenter.png", scale = 0.9)+
+  ggtitle("Figure 5")
+pp1<- plot_grid(p1, p2, p3, p4)
+ggdraw(add_sub(pp1, "Figure 2. Effect Plots of GAM", vpadding=grid::unit(0, "lines"), y = 4, x = 0.4, hjust = 0, size=8, fontface="bold"))
+```
+
+```{r message=FALSE, echo=FALSE}
+library(cowplot)
+library(ggplot2)
+p1 <- ggdraw() + draw_image("GAMPlotMaternalAge.png", scale = 0.9)+
+  ggtitle("Figure 4")
+p2 <- ggdraw() + draw_image("GAMPlotCenter.png", scale = 0.9)+
+  ggtitle("Figure 5")
 pp1<- plot_grid(p1, p2)
-ggdraw(add_sub(pp1, "Figure 2 & 3. Marginal Effect Plot for DDE and PC1", vpadding=grid::unit(0, "lines"), y = 10, x = 0.32, hjust = 0, size=8, fontface="bold"))
+ggdraw(add_sub(pp1, "Figure 4 & 5. Effect Plot for Maternal Age and Center", vpadding=grid::unit(0, "lines"), y = 12, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
 
 \begin{table}[ht]
@@ -153,3 +168,161 @@ p1 <- ggdraw() + draw_image("BGAM2.jpeg", scale = 0.9)+
   ggtitle("Figure 4")
 ggdraw(add_sub(p1, "Figure 5. Bayesian GAM model check", vpadding=grid::unit(0, "lines"), y = 3, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
+
+\newpage
+
+## Appendix B. Codes and Outputs
+### 1 EDA
+
+#### 1.1 
+
+```{r}
+dat = readRDS("Longnecker.rds")
+dat$center = factor(dat$center)
+dat$smoking_status = factor(dat$smoking_status)
+
+dat = dat[-1861,]
+library(mice)
+dat = dat[,!names(dat) %in% c('albumin')]
+imp = mice(dat)
+dat = complete(imp)
+
+dat$ind_37 = dat$gestational_age < 37
+dat[,c(1:12,13,15,16,17,18,20)] = scale(dat[,c(1:12,13,15,16,17,18,20)])
+
+```
+
+### 2 PCA
+
+#### 2.1 PCA results
+
+```{r}
+## PCA
+
+pca = princomp(dat[,2:12])
+pcb = as.matrix(dat[,2:12])
+pcb_pc = pcb %*% pca$loadings
+print(pca$loadings)
+summary(pca)
+
+dat$PC1 = pcb_pc[,1]
+dat$PC2 = pcb_pc[,2]
+dat$PC3 = pcb_pc[,3]
+dat$PC4 = pcb_pc[,4]
+```
+
+### 3 GAM model
+
+#### 3.1 Fit GAM model
+
+```{r}
+library(gam)
+ga1 = gam(ind_37 ~ s(dde) + s(PC1) + s(PC2) + s(PC3) + s(PC4) +
+            s(triglycerides) + score_education + score_income + score_occupation + 
+            s(maternal_age) + s(cholesterol) + smoking_status + center + race, 
+          family = binomial(link = 'logit'), data = dat)
+summary(ga1)
+par(mfrow = c(3,4))
+plot(ga1, se = TRUE)
+```
+
+#### 3.2 Effect of DDE and PC1
+
+```{r}
+# Extract DDE effects
+new_data <- new_data_add <- dat[1,]
+dde_effect <- function(dde_test){
+  new_data$dde <- dde_test
+  pred_orig <- predict(ga1, new_data, type = "response") 
+  # response: prob, link: log odds
+  new_data_add$dde <- dde_test + 0.001
+  pred_add <- predict(ga1, new_data_add, type = "response")
+  return ((pred_add-pred_orig) / 0.001)
+}
+
+summary(dat$dde)
+
+Scale_DDE <- c(-1,2,4,6)
+Percent_Prob_Change <- c(dde_effect(-1)*100,
+                 dde_effect(2)*100,
+                 dde_effect(4)*100,
+                 dde_effect(6)*100)
+df <- data.frame(Scale_DDE, Percent_Prob_Change)
+
+library(knitr)
+kable(df)
+```
+
+```{r}
+# Extract effects of PC1
+new_data <- new_data_add <- dat[1,]
+PC1_effect <- function(PC1_test){
+  new_data$PC1 <- PC1_test
+  pred_orig <- predict(ga1, new_data, type = "response") 
+  # response: prob, link: log odds
+  new_data_add$PC1 <- PC1_test + 0.001
+  pred_add <- predict(ga1, new_data_add, type = "response")
+  return ((pred_add-pred_orig) / 0.001)
+}
+
+summary(dat$PC1)
+
+PC1_effect(-3)
+PC1_effect(3)
+PC1_effect(7) 
+PC1_effect(10)
+
+PC1 <- c(-3,3,7,10)
+Percent_Prob_Change <- c(PC1_effect(-3)*100,
+                 PC1_effect(3)*100,
+                 PC1_effect(7)*100,
+                 PC1_effect(10)*100)
+df <- data.frame(PC1, Percent_Prob_Change)
+
+library(knitr)
+kable(df)
+```
+
+### 4 Bayesian GAM
+
+Bayesian Generalized Additive Model
+$$g(Y_i) = \beta_0 + \sum_{j=1}^m f_j(x_{ij}) + \sum_{k=1}^l \beta_{k}z_{ik}$$
+
+We add priors on the common regression coefficients, priors on the standard deviations of the smooth terms. The priors are set by default in $rstanarm$ package, which is a weak informative normal prior. 
+
+
+#### 4.1 Model results
+
+```{r}
+
+library(rstanarm)
+
+b_ga = stan_gamm4(ind_37 ~ s(dde) + s(PC1) + s(PC2)+
+                    s(triglycerides) + race + score_education + score_income +
+                    score_occupation + s(maternal_age) + smoking_status +
+                    s(cholesterol) + center,
+                   family = binomial(link = 'logit'), data = dat,
+                  chain = 1, iter=1000)
+
+plot_nonlinear(b_ga)
+
+```
+
+
+#### 4.2 Model check
+
+```{r}
+
+library(arm)
+
+pred.probs_gam <-  predict(b_ga, dat, type = 'response') # Calculate predicted probabilities
+resid_gam <- residuals(b_ga) # residuals
+
+binnedplot(x = pred.probs_gam ,y = resid_gam, nclass=NULL, 
+            xlab="Predicted value", ylab="Average residual", 
+            main="Binned residual plot: residual vs estimated probabilities for gam", 
+            cex.pts=0.8, col.pts=1, col.int="gray")
+
+```
+
+
