@@ -38,36 +38,9 @@ However, frequentist approach may overestimate uncertainty and produce a non-sig
 
 ### 3.2 Main Results
 
-Using frequentist GAM, we found that there are slightly positive association between chemical exposures and preterm delivery. Among all covariates, DDE, PC1, As shown in Figure 1 in the appendix, as DDE level increases, the log-odds of preterm delivery increases. And in Figure 2, increasing PC1 is associated with increasing log-odds of preterm delivery. The change in probability of preterm delivery at different levels of DDE and PC1 are summarized in the table below:
+Using frequentist GAM, we found that there are slightly positive association between chemical exposures and preterm delivery. Among all covariates, DDE, PC1, As shown in Figure 1 in the appendix, as DDE level increases, the log-odds of preterm delivery increases. And in Figure 2, increasing PC1 is associated with increasing log-odds of preterm delivery. The change in probability of preterm delivery at different levels of DDE and PC1 are summarized in Tables 1 & 2 in the Appendix.
 
-\begin{table}[ht]
-\centering
-\begin{tabular}{rrr}
-  \hline
- & Scaled DDE & \% Change in Probability \\ 
-  \hline
-1 & -1.00 & 1.43 \\ 
-  2 & 2.00 & 1.23 \\ 
-  3 & 4.00 & 0.32 \\ 
-   \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{rrr}
-  \hline
- & PC1 & \% Change in Probability \\ 
-  \hline
-1 & -3.00 & 0.35 \\ 
-  2 & 3.00 & 0.66 \\ 
-  3 & 7.00 & 2.11 \\ 
-  4 & 10.00 & 4.88 \\ 
-   \hline
-\end{tabular}
-\end{table}
-
-As shown in the tables above, higher DDE level is associated with higher probability of preterm delivery. But the rate of increment decreases as DDE level increases, which aligns with our presumption of dose-response effect (the effect may be less significant as chemical level increases). As for PC1, there is also positive association between PC1 and the probability of preterm delivery. As PC1 has positive relationship with PCBs, the PCBs also have positive association with preterm delivery. Hence, we conclude that the chemicals (DDE and PCBs) have positive association with preterm delivery.
+As shown in the tables, higher DDE level is associated with higher probability of preterm delivery. But the rate of increment decreases as DDE level increases, which aligns with our presumption of dose-response effect (the effect may be less significant as chemical level increases). As for PC1, there is also positive association between PC1 and the probability of preterm delivery. As PC1 has positive relationship with PCBs, the PCBs also have positive association with preterm delivery. Hence, we conclude that the chemicals (DDE and PCBs) have positive association with preterm delivery.
 
 Results from our Bayesian Generalized Additive Model align with previous results in frequentist approach. In Figure 1, higher concentration of DDE and PCBs is related to higher risks for pregnant women. In addition, both DDE and the first principle component have significant p-values, indicating the importance of these exposures in the relationship with the response. If we further consier use estimates of Bayesian GAM to check residual assumptions of GAM, Figure 2 verifies the correctness of Bayesian GAM, which outperforms that of frequentist approach. Estimated effects of DDE and PCBs also have narrower credible intervals compared to frequentist ones. Our model capture some flat regions when concentration is relatively low and high. 
 
@@ -117,6 +90,35 @@ p2 <- ggdraw() + draw_image("GAMPlotPC1.png", scale = 0.9)+
 pp1<- plot_grid(p1, p2)
 ggdraw(add_sub(pp1, "Figure 1 & 2. Marginal Effect Plot for DDE and PC1", vpadding=grid::unit(0, "lines"), y = 10, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Scaled DDE & \% Change in Probability \\ 
+  \hline
+1 & -1.00 & 1.43 \\ 
+  2 & 2.00 & 1.23 \\ 
+  3 & 4.00 & 0.32 \\ 
+   \hline
+\end{tabular}
+\caption{Change in Probability of Preterm Delivery at Different DDE Levels}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & PC1 & \% Change in Probability \\ 
+  \hline
+1 & -3.00 & 0.35 \\ 
+  2 & 3.00 & 0.66 \\ 
+  3 & 7.00 & 2.11 \\ 
+  4 & 10.00 & 4.88 \\ 
+   \hline
+\end{tabular}
+\caption{Change in Probability of Preterm Delivery at Different PC1 Levels}
+\end{table}
 
 ```{r, echo=FALSE, fig.cap="Bayesian Generalized Additive Model", out.width = '100%',fig.align = "center"}
 knitr::include_graphics("BGAM.jpeg")
