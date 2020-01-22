@@ -44,7 +44,7 @@ Using frequentist GAM, we found that there are slightly positive association bet
 
 As shown in the tables, higher DDE level is associated with higher probability of preterm delivery. But the rate of increment decreases as DDE level increases, which aligns with our presumption of dose-response effect (the effect may be less significant as chemical level increases). As for PC1, there is also positive association between PC1 and the probability of preterm delivery. As PC1 has positive relationship with PCBs, the PCBs also have positive association with preterm delivery. Hence, we conclude that the chemicals (DDE and PCBs) have positive association with preterm delivery.
 
-Results from our Bayesian Generalized Additive Model align with previous results in frequentist approach. In Figure 4, higher concentration of DDE and PCBs is related to higher risks for pregnant women. In addition, both DDE and the first principle component have significant p-values, indicating the importance of these exposures in the relationship with the response. If we further consier use estimates of Bayesian GAM to check residual assumptions of GAM, Figure 5 verifies the correctness of Bayesian GAM, which outperforms that of frequentist approach. Estimated effects of DDE and PCBs also have narrower credible intervals compared to frequentist ones. Our model capture some flat regions when concentration is relatively low and high. 
+Results from our Bayesian Generalized Additive Model align with previous results in frequentist approach. In Figure 3, higher concentration of DDE and PCBs is related to higher risks for pregnant women. In addition, both DDE and the first principle component have significant p-values, indicating the importance of these exposures in the relationship with the response. If we further consier use estimates of Bayesian GAM to check residual assumptions of GAM, Figure 4 verifies the correctness of Bayesian GAM, which outperforms that of frequentist approach. Estimated effects of DDE and PCBs also have narrower credible intervals compared to frequentist ones. Our model capture some flat regions when concentration is relatively low and high. 
 
 Increase of 1 unit in DDE leads to approxiamately an increase of 0.017 in log odds when DDE has the lowest concentration 2.5 ug/dL. And it decrease to 0.015 when DDE reaches the average concentration 30 ug/dL. But when DDE reaches 120 ug/dL, its increase does not impact the log odds of risk (almost constant risk). This flat region result aligns with domain knowledge of epidemiology that chemical effects become stable after reaching a upper bound. We conclude similar results when analyzing the first principle component of PCBs: when PC1 is lower than 0 or higher than 15, Bayesian GAM shows that change in PC1 has almost no effect. But when PC1 is around its mean value 7.5, one unit increase in PC1 results in an increase of 0.1 in log odds. Note that all loadings for the first PC are positive, where pcb_74, pcb_105, pcb_138, etc. have loadings over 0.3. Therefore after transforming back to original scale, flat region still exist for PCBs, and unit increase in one specific PCB can be attained. (e.g. one unit increase in pcb_138 leads to an increase of 0.66 in log odds when pcb_138 is at mean level 0.67 ng/dL)
 
@@ -116,17 +116,6 @@ pp1<- plot_grid(p1, p2, p3, p4)
 ggdraw(add_sub(pp1, "Figure 2. Effect Plots of GAM", vpadding=grid::unit(0, "lines"), y = 4, x = 0.4, hjust = 0, size=8, fontface="bold"))
 ```
 
-```{r message=FALSE, echo=FALSE}
-library(cowplot)
-library(ggplot2)
-p1 <- ggdraw() + draw_image("GAMPlotMaternalAge.png", scale = 0.9)+
-  ggtitle("Figure 4")
-p2 <- ggdraw() + draw_image("GAMPlotCenter.png", scale = 0.9)+
-  ggtitle("Figure 5")
-pp1<- plot_grid(p1, p2)
-ggdraw(add_sub(pp1, "Figure 4 & 5. Effect Plot for Maternal Age and Center", vpadding=grid::unit(0, "lines"), y = 12, x = 0.32, hjust = 0, size=8, fontface="bold"))
-```
-
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrr}
@@ -158,15 +147,15 @@ ggdraw(add_sub(pp1, "Figure 4 & 5. Effect Plot for Maternal Age and Center", vpa
 
 ```{r, echo=FALSE, out.width = '80%',fig.align = "center"}
 p1 <- ggdraw() + draw_image("BGAM.jpeg", scale = 0.9)+
-  ggtitle("Figure 4")
-ggdraw(add_sub(p1, "Figure 4. Nonlinear trend of several variables in Bayesian GAM", vpadding=grid::unit(0, "lines"), y = 3, x = 0.3, hjust = 0, size=8, fontface="bold"))
+  ggtitle("Figure 3")
+ggdraw(add_sub(p1, "Figure 3. Nonlinear trend of several variables in Bayesian GAM", vpadding=grid::unit(0, "lines"), y = 3, x = 0.3, hjust = 0, size=8, fontface="bold"))
 #knitr::include_graphics("BGAM.jpeg")
 ```
 
 ```{r, echo=FALSE, out.width = '80%',fig.align = "center"}
 p1 <- ggdraw() + draw_image("BGAM2.jpeg", scale = 0.9)+
   ggtitle("Figure 4")
-ggdraw(add_sub(p1, "Figure 5. Bayesian GAM model check", vpadding=grid::unit(0, "lines"), y = 3, x = 0.32, hjust = 0, size=8, fontface="bold"))
+ggdraw(add_sub(p1, "Figure 4. Bayesian GAM model check", vpadding=grid::unit(0, "lines"), y = 3, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
 
 \newpage
