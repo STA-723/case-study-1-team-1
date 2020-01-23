@@ -256,11 +256,6 @@ PC1_effect <- function(PC1_test){
 
 summary(dat$PC1)
 
-PC1_effect(-3)
-PC1_effect(3)
-PC1_effect(7) 
-PC1_effect(10)
-
 PC1 <- c(-3,3,7,10)
 Percent_Prob_Change <- c(PC1_effect(-3)*100,
                  PC1_effect(3)*100,
