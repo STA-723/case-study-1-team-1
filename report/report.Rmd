@@ -4,7 +4,7 @@ author: "Melody Jiang, Irene Ji, Keru Wu"
 date: "1/20/2020"
 output:
   pdf_document
-geometry: margin=1.2in 
+geometry: margin=1.1in 
 ---
 \fontsize{10}{12}
 \selectfont
