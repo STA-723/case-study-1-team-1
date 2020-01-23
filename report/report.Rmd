@@ -15,19 +15,20 @@ This report evaluates association between exposures Dichlorodiphenyldichloroethy
 
 ## 1. Introduction
 
-The dataset taken from CPP was studied by Longnecker et al., including 2380 samples of women and their children which (2001). It is of interest to study how chemical exposures relate to preganancy since abnormalities in pregnancy such as preterm birth might cause unfavorable developmental outcomes in children. Preterm birth is deliveries occuring earlier than 37 weeks of gestational age. DDE and PCBs are of primary interest among all exposures, both of which are breakdown products in the body of chemicals. These chemicals build up fatty deposits and exist universally in our body, potentially impacting our health. The dataset also contains other possible confounding covariates such as cholesterol, triglyceridesage, maternal age, race, smoking status and testing center. The goal of our analysis is to assess how DDE and PCBs relate the risk of preterm birth, controlling for counfounding variables.
+The dataset taken from CPP was studied by Longnecker et al., including 2380 samples of women and their children (2001). It is of interest to study how chemical exposures relate to preganancy since abnormalities in pregnancy such as preterm birth might cause unfavorable developmental outcomes in children. Preterm birth refers to deliveries occuring earlier than 37 weeks of gestational age. DDE and PCBs are of primary interest among all exposures, both of which are breakdown products in the body of chemicals. These chemicals build up fatty deposits and exist universally in our body, potentially impacting our health. The dataset also contains other possible confounding covariates such as cholesterol, triglycerides, age, maternal age, race, smoking status and testing center. The goal of our analysis is to assess how DDE and PCBs relate the risk of preterm birth, controlling for counfounding variables.
 
-Our findings demonstrate that there is positive association between two interested exposures and the risk of preterm birth. Higher concentrations of DDE and PCBs are related to higher risk of premature delivery. Although various PCBs show diffrent significance in the relationship, generally they all contribute to higher risk. Some noticable PCBs are pcb_074, pcb_105, pcb_118, pcb_153 and pcb_170. Another finding of our analysis is that when concentration of these exposures is below a threshold, both exposures have little effect, while they have a constant effect when they are above a higher threshold.
+Our findings demonstrate that there is positive association between two interested exposures and the risk of preterm birth. Higher concentrations of DDE and PCBs are related to higher risk of premature delivery. Although various PCBs show diffrent significance in the relationship, generally they all contribute to higher risk. Some noticable PCBs are pcb_074, pcb_105, pcb_118, pcb_153 and pcb_170. Another finding of our analysis is that when concentrations of these exposures are above some thresholds, the effects seem to be stabilized.
+
 
 ## 2. Materials $\&$ Methods
 
-We grouped Gestational Age into binary response variable (Preterm Delivery or Non-preterm Delivery). On handeling missing data, we removed albumin from our dataset because around 93% of this variable is missing. There is only one observation missing DDE and PCBs, and we removed this observation. We imputed missing data in the covariates using the *MICE* R package. We applied Principle Component Analysis (PCA) to PCBs and obtained 5 Principle Components (PCs), which can be seen as aggregation of PCBs. 
+We grouped Gestational Age into binary response variable (Preterm Delivery or Non-preterm Delivery). On handeling missing data, we removed albumin from our dataset because around 93% of this variable is missing. There is only one observation missing DDE and PCBs, and we removed this observation. We imputed missing data in the covariates using the *MICE* R package. We applied Principle Component Analysis (PCA) to PCBs and reduced the dimension of covariates by taking top 4 Principal Components (PCs). 
 
-After data pre-processing, in order to allow for non-linear dose-response relationship, we applied logistic Generalized Additive Model (GAM) to fit the data.The model smoothes numeric covariates, including DDE, Pricipal Components (PCs) 1 to 4 of PCBs, Maternal Age, triglycerides level and cholesterol level to allow for non-linear association. Furthermore, we adjusted for categorical confounding variables by including them in the model. 
+After data pre-processing, in order to allow for non-linear dose-response relationship, we applied logistic Generalized Additive Model (GAM) to fit the data.The model smoothes numeric covariates, including DDE, PCs 1 to 4 of PCBs, Maternal Age, triglycerides level and cholesterol level to allow for non-linear association. Furthermore, we adjusted for categorical confounding variables by including them in the model. 
 
 We conducted model checking on the fitted GAM model and examined the effect plots of DDE and PCs. In order to quantify the association for DDE and PCBs (via PCs), we controled for all other covariates and computed the change in probability of Preterm Delivery at different levels of DDE and PCs.
 
-However, frequentist approach may overestimate uncertainty and produce a non-significant p-value. In addition, residual plot of previous GAM model indicates that assumptions of frequentist GAM could be unwarranted. To improve performance of our model, we instead use a Bayesian Generalized Additive Model. We add priors on the common regression coefficients and priors on the standard deviations of the smooth terms. We use default settings in $stan_gamm4$ function in R package $rstanarm$, which adopts a weak informative normal prior for all common regression coefficients and standard deviations of the smooth terms.
+However, frequentist approach may overestimate uncertainty and produce a non-significant p-value. Residual plot of previous GAM model indicates that assumptions of frequentist GAM could be unwarranted. To improve performance of our model, we instead used a Bayesian Generalized Additive Model. We added priors on the common regression coefficients and priors on the standard deviations of the smooth terms. We used default settings in $stan_gamm4$ function in R package $rstanarm$, which adopts a weak informative normal prior for all common regression coefficients and standard deviations of the smooth terms.
 
 
 ## 3. Results
@@ -40,15 +41,13 @@ After data pre-processing, we examined the distribution of DDE and first princip
 
 ### 3.2 Main Results
 
-Using frequentist GAM, we found that there are slightly positive association between chemical exposures and preterm delivery. Among all covariates, DDE, PC1, As shown in Figure 2 in the appendix, as DDE level increases, the log-odds of preterm delivery increases. Increasing PC1 is also associated with increasing log-odds of preterm delivery. The change in probability of preterm delivery at different levels of DDE and PC1 are summarized in Tables 1 & 2 in the Appendix.
+Using frequentist GAM, we found that there are slightly positive association between chemical exposures and preterm delivery. As shown in Figure 2 of Appendix A, as DDE level increases, the log-odds of preterm delivery increases. Increasing PC1 is also associated with increasing log-odds of preterm delivery. The change in probability of preterm delivery at different levels of DDE and PC1 are summarized in Tables 1 & 2 in Appendix A.
 
-As shown in the tables, higher DDE level is associated with higher probability of preterm delivery. But the rate of increment decreases as DDE level increases, which aligns with our presumption of dose-response effect (the effect may be less significant as chemical level increases). As for PC1, there is also positive association between PC1 and the probability of preterm delivery. As PC1 has positive relationship with PCBs, the PCBs also have positive association with preterm delivery. Hence, we conclude that the chemicals (DDE and PCBs) have positive association with preterm delivery.
+As shown in the tables, higher DDE level is associated with higher probability of preterm delivery. But the rate of increment decreases as DDE level increases, which aligns with our presumption of dose-response effect (the effect may be less significant as chemical level reaches certain threshold). As for PC1, there is also positive association between PC1 and the probability of preterm delivery. As PC1 is an aggregation of PCBs with positive loadings, the PCBs also have positive association with preterm delivery. Hence, we conclude that the chemicals (DDE and PCBs) have positive association with preterm delivery.
 
-Results from our Bayesian Generalized Additive Model align with previous results in frequentist approach. In Figure 3, higher concentration of DDE and PCBs is related to higher risks for pregnant women. In addition, both DDE and the first principle component have significant p-values, indicating the importance of these exposures in the relationship with the response. If we further consier use estimates of Bayesian GAM to check residual assumptions of GAM, Figure 4 verifies the correctness of Bayesian GAM, which outperforms that of frequentist approach. Estimated effects of DDE and PCBs also have narrower credible intervals compared to frequentist ones. Our model capture some flat regions when concentration is relatively low and high. 
+Results from our Bayesian Generalized Additive Model align with previous results in frequentist approach. In Figure 3, higher concentration of DDE and PCBs is related to higher risks for pregnant women. In addition, both DDE and the first principle component have significant p-values, indicating the importance of these exposures in the relationship with the response. If we further consider using estimates of Bayesian GAM to check residual assumptions of GAM, Figure 4 verifies the correctness of Bayesian GAM, which outperforms that of frequentist approach. Estimated effects of DDE and PCBs also have narrower credible intervals compared to frequentist ones. Our model capture some flat regions when concentration is relatively high. 
 
 Increase of 1 unit in DDE leads to approxiamately an increase of 0.017 in log odds when DDE has the lowest concentration 2.5 ug/dL. And it decrease to 0.015 when DDE reaches the average concentration 30 ug/dL. But when DDE reaches 120 ug/dL, its increase does not impact the log odds of risk (almost constant risk). This flat region result aligns with domain knowledge of epidemiology that chemical effects become stable after reaching a upper bound. We conclude similar results when analyzing the first principle component of PCBs: when PC1 is lower than 0 or higher than 15, Bayesian GAM shows that change in PC1 has almost no effect. But when PC1 is around its mean value 7.5, one unit increase in PC1 results in an increase of 0.1 in log odds. Note that all loadings for the first PC are positive, where pcb_74, pcb_105, pcb_138, etc. have loadings over 0.3. Therefore after transforming back to original scale, flat region still exist for PCBs, and unit increase in one specific PCB can be attained. (e.g. one unit increase in pcb_138 leads to an increase of 0.66 in log odds when pcb_138 is at mean level 0.67 ng/dL)
-
-
 
 
 ### 3.3 Sensitivity Analysis
@@ -58,12 +57,11 @@ Frequentist GAM and Bayesian GAM give confidence intervals and credible interval
 In addition, how to deal with the collinearity of PCBs and carry out dimensionality reduction has great influence in our approach. Our adopted PCA approach has the best performance compared to simple sum and factor analysis, which either have low sigfinicance for PCBs, or become unwarranted after model check. 
 
 
-
 ## 4. Discussion
 
-This report has analyzed how DDE and PCBs relate to the risk of premature delivery. After preprocessing data (e.g. impute missing data) and dimensionality reduction (PCA), we build up different models for the data and finally adopt the Generalized Additive Model (GAM) and its Bayesian version. Our approach has advantages that it captures the nonlinearity relationship between exposures and outcomes, and it also fits confounding variables. We conclude that higher exposure to DDE and certain PCBs may be associated with higher risk of premature delivery. 
+This case study has analyzed how DDE and PCBs relate to the risk of premature delivery. After preprocessing data (e.g. impute missing data) and dimensionality reduction (PCA), we build up different models for the data and finally adopt the Generalized Additive Model (GAM) and its Bayesian version. Our approach has advantages that it captures the nonlinearity relationship between exposures and outcomes, and it also takes confounding variables into account. We conclude that higher exposure to DDE and certain PCBs may be associated with higher risk of premature delivery. 
 
-The first extension of our approach is to deal with different centers specially. Our model demonstrates that center 15 and center 37 may deviate from others, which genrally collect samples with higher risks. There are other ways which may perform better in dealing with centers. One can adopt a Bayesian hierarchical model which specifies different variances between centers. Another more direct extension of our GAM model is to include mixed effect. We may use Generalized Additive Mixed Model (GAMM) to consider random effect of centers and it can also be applied to other categorical variables like smoking status and race.
+The first extension of our approach is to deal with different centers specially. Our model demonstrates that center 15 and center 37 may deviate from others, which generally collect samples with higher risks. There are other ways which may perform better in dealing with centers. One can adopt a Bayesian hierarchical model which specifies different variances between centers. Another more direct extension of our GAM model is to include mixed effect. We may use Generalized Additive Mixed Model (GAMM) to consider random effect of centers and it can also be applied to other categorical variables like smoking status and race.
 
 After we find out that DDE and PCBs are related to higher risk of preterm birth, we can examine the trend of exposures effects more accurately. Specifying a special prior (e.g. guarantee monotonicity) may benefit from narrower credible intervals compared to frequentist approach and naive bayes approach. 
 
@@ -273,6 +271,19 @@ df <- data.frame(PC1, Percent_Prob_Change)
 library(knitr)
 kable(df)
 ```
+
+#### 3.3 GAM Residual Plot
+
+```{r}
+pred.probs_gam <- predict(ga1, type="response") # Calculate predicted probabilities
+resid_gam <- residuals(ga1) # residuals
+library(arm)
+binnedplot(x = pred.probs_gam ,y = resid_gam, nclass=NULL, 
+            xlab="dde", ylab="Average residual", 
+            main="Binned residual plot: residual vs estimated probabilities for gam",
+            cex.pts=0.8, col.pts=1, col.int="gray")
+```
+
 
 ### 4 Bayesian GAM
 
