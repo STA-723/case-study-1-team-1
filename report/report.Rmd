@@ -15,15 +15,15 @@ This report evaluates association between exposures Dichlorodiphenyldichloroethy
 
 ## 1. Introduction
 
-The dataset taken from CPP includes 2380 samples of women and their children which was studied by Longnecker et al. (2001). It is of interest to study how chemical exposures relate to preganancy since abnormalities in pregnancy such as preterm birth might cause unfavorable developmental outcomes in children. Preterm birth is deliveries occuring earlier than 37 weeks of gestational age. DDE and PCBs are of primary interest among all exposures, both of which are breakdown products in the body of chemicals. These chemicals build up fatty deposits and exist universally in our body, potentially impacting our health. The dataset also contains other possible confounding variables such as cholesterol, triglyceridesage, maternal age, race and smoking status. The goal of our analysis is to assess how DDE and PCBs relate the risk of preterm birth, controlling for counfounding variables.
+The dataset taken from CPP was studied by Longnecker et al., including 2380 samples of women and their children which (2001). It is of interest to study how chemical exposures relate to preganancy since abnormalities in pregnancy such as preterm birth might cause unfavorable developmental outcomes in children. Preterm birth is deliveries occuring earlier than 37 weeks of gestational age. DDE and PCBs are of primary interest among all exposures, both of which are breakdown products in the body of chemicals. These chemicals build up fatty deposits and exist universally in our body, potentially impacting our health. The dataset also contains other possible confounding covariates such as cholesterol, triglyceridesage, maternal age, race, smoking status and testing center. The goal of our analysis is to assess how DDE and PCBs relate the risk of preterm birth, controlling for counfounding variables.
 
 Our findings demonstrate that there is positive association between two interested exposures and the risk of preterm birth. Higher concentrations of DDE and PCBs are related to higher risk of premature delivery. Although various PCBs show diffrent significance in the relationship, generally they all contribute to higher risk. Some noticable PCBs are pcb_074, pcb_105, pcb_118, pcb_153 and pcb_170. Another finding of our analysis is that when concentration of these exposures is below a threshold, both exposures have little effect, while they have a constant effect when they are above a higher threshold.
 
 ## 2. Materials $\&$ Methods
 
-After grouping Gestational Age into binary response variable (Preterm Delivery or Non-preterm Delivery), in order to allow for non-linear dose-response relationship, we applied Generalized Additive Model (GAM) to fit the data.
+We grouped Gestational Age into binary response variable (Preterm Delivery or Non-preterm Delivery). On handeling missing data, we removed albumin from our dataset because around 93% of this variable is missing. There is only one observation missing DDE and PCBs, and we removed this observation. We imputed missing data in the covariates using the *MICE* R package. We applied Principle Component Analysis (PCA) to PCBs and obtained 5 Principle Components (PCs), which can be seen as aggregation of PCBs. 
 
-Logit transformation is applied to the binary response variable. Numeric covariates, including DDE, Pricipal Components (PCs) 1 to 4 of PCBs, Maternal Age, triglycerides level and cholesterol level are smoothed to allow for non-linear association. Furthermore, we also adjusted for categorical confounding variables by including them in the model as linear covariates, which includes Smoking Status, Race, Center, etc. 
+After data pre-processing, in order to allow for non-linear dose-response relationship, we applied logistic Generalized Additive Model (GAM) to fit the data.The model smoothes numeric covariates, including DDE, Pricipal Components (PCs) 1 to 4 of PCBs, Maternal Age, triglycerides level and cholesterol level to allow for non-linear association. Furthermore, we adjusted for categorical confounding variables by including them in the model. 
 
 We conducted model checking on the fitted GAM model and examined the effect plots of DDE and PCs. In order to quantify the association for DDE and PCBs (via PCs), we controled for all other covariates and computed the change in probability of Preterm Delivery at different levels of DDE and PCs.
 
@@ -34,9 +34,9 @@ However, frequentist approach may overestimate uncertainty and produce a non-sig
 
 ### 3.1 Exploratary Data Analysis and Preprocessing
 
-On handeling missing data, we removed albumin from our dataset because around 93% of this variable is missing. There is only one observation missing DDE and PCBs, and we removed this observation. We imputed missing data in the covariates using the *MICE* R package. We examined the correlation among explanatory variables and found high correlation between PCBs, as shown in Figure 1A. Such high correlation might distort modeling result, so we made PCBs into Principal Components (PCs) as introduced in Section 2.
+We examined the correlation among explanatory variables and found high correlation between PCBs, as shown in Figure 1A. Such high correlation might distort modeling result, so we made PCBs into Principal Components (PCs), as shown in Figure 1B.
 
-After data pre-processing, we examined the distribution of DDE and first principle component of PCB, and found that for both DDE and PCB, the concentration of chemical is generally higher in observations that has preterm delivery, as shown in Figure 1B and Figure 1C. Among the possible covariates, most notably, there is a nonlinear relationship between age of mother and proportion of early delivery, as shown in Figure 1D.
+After data pre-processing, we examined the distribution of DDE and first principle component of PCB, and found that for both DDE and PCB, the concentration of chemical is generally higher in observations that has preterm delivery, as shown in Figure 1C and Figure 1D. Among the possible covariates, most notably, there is a nonlinear relationship between age of mother and proportion of early delivery, as shown in Figure 1E.
 
 ### 3.2 Main Results
 
@@ -97,7 +97,9 @@ p3 <- ggdraw() + draw_image("pcbVSearly.png", scale = 0.9)+
   ggtitle("Figure 3")
 p4 <- ggdraw() + draw_image("earlyVSAge.png", scale = 0.9)+
   ggtitle("Figure 4")
-pp1 <- plot_grid(p1, p2, p3, p4, labels = "AUTO")
+p5 <- ggdraw() + draw_image("PCA.png", scale = 0.9) +
+  ggtitle("Figure 5")
+pp1 <- plot_grid(p1, p5, p2, p3, p4, labels = "AUTO")
 ggdraw(add_sub(pp1, "Figure 1. Plots for exploratory data analysis", vpadding=grid::unit(0, "lines"), y = 2, x = 0.32, hjust = 0, size=8, fontface="bold"))
 ```
 

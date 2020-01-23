@@ -87,7 +87,7 @@ scaleFUN <- function(x) sprintf("%.2f", x)
 ```
 
 ```{r}
-dat_temp <- as.data.frame(table(format(round(dat$maternal_age, 2), nsmall = 2), dat$ind_37))
+dat_temp <- as.data.frame(table(dat$maternal_age, dat$ind_37))
 ggplot(dat_temp, aes(x = Var1, y = Freq, fill = Var2)) + 
     geom_bar(position = "fill",stat = "identity") +
     # or:
